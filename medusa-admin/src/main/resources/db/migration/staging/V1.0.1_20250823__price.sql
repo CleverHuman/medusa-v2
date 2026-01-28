@@ -1,0 +1,2 @@
+ALTER TABLE mall_product2
+    MODIFY price DECIMAL(10, 2) DEFAULT 0.00 NOT NULL;

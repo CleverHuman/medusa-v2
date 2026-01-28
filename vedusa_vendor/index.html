@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Application & Onboarding System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-text {
+            background: linear-gradient(135deg, #1e3a8a, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-bg {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1e40af, #1e3a8a);
+            transform: translateY(-2px);
+        }
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes pulse-glow {
+            from { box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
+            to { box-shadow: 0 0 30px rgba(245, 158, 11, 0.6); }
+        }
+        #particles-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .content-overlay {
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-gray-900">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md fixed w-full top-0 z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-amber-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">V</span>
+                    </div>
+                    <span class="text-xl font-bold text-gray-900">VendorPortal</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-gray-600 hover:text-blue-600 transition-colors">Features</a>
+                    <a href="#process" class="text-gray-600 hover:text-blue-600 transition-colors">Process</a>
+                    <a href="#stats" class="text-gray-600 hover:text-blue-600 transition-colors">Statistics</a>
+                    <button onclick="openAdminPanel()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Admin Panel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg min-h-screen flex items-center relative overflow-hidden pt-16">
+        <canvas id="particles-canvas"></canvas>
+        <div class="content-overlay max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8">
+                    <div class="space-y-4">
+                        <h1 class="text-5xl lg:text-6xl font-bold leading-tight">
+                            <span class="gradient-text">Vendor Application</span><br>
+                            <span class="text-gray-900">& Onboarding Process</span>
+                        </h1>
+                        <p class="text-xl text-gray-600 leading-relaxed">
+                            Streamline vendor onboarding with our intelligent application system. Build efficient partnerships starting from a professional first step.
+                        </p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button onclick="startApplication()" class="btn-primary text-white px-8 py-4 rounded-xl font-semibold text-lg">
+                            Start Application
+                        </button>
+                        <button onclick="trackStatus()" class="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-blue-600 hover:bg-blue-50 transition-all">
+                            Track Status
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-6 text-sm text-gray-500">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span>Secure & Encrypted</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span>24/7 Available</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2 h-2 bg-amber-500 rounded-full"></div>
+                            <span>Professional Review</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="floating-element">
+                        <img src="hero-image.png" alt="Professional workspace" class="rounded-2xl shadow-2xl w-full h-auto">
+                    </div>
+                    <div class="absolute -top-4 -right-4 w-24 h-24 bg-amber-400 rounded-full pulse-glow"></div>
+                    <div class="absolute -bottom-6 -left-6 w-16 h-16 bg-blue-500 rounded-full opacity-80"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">System Features</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Integrated vendor management solution with full digitalization from application to review
+                </p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="card-hover bg-white p-8 rounded-2xl border border-gray-200">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Smart Forms</h3>
+                    <p class="text-gray-600">Multi-step intelligent forms with real-time validation and auto-save for a smooth application process.</p>
+                </div>
+                <div class="card-hover bg-white p-8 rounded-2xl border border-gray-200">
+                    <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Auto Review</h3>
+                    <p class="text-gray-600">Intelligent review process with automatic key information verification to improve efficiency and accuracy.</p>
+                </div>
+                <div class="card-hover bg-white p-8 rounded-2xl border border-gray-200">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Real-time Tracking</h3>
+                    <p class="text-gray-600">Application status updated in real-time with transparent processing workflow, keeping vendors informed of progress.</p>
+                </div>
+                <div class="card-hover bg-white p-8 rounded-2xl border border-gray-200">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Security & Encryption</h3>
+                    <p class="text-gray-600">Enterprise-grade security protection with encrypted data transmission to ensure business information safety.</p>
+                </div>
+                <div class="card-hover bg-white p-8 rounded-2xl border border-gray-200">
+                    <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Data Analytics</h3>
+                    <p class="text-gray-600">Powerful data analysis features to help managers understand vendor quality and application trends.</p>
+                </div>
+                <div class="card-hover bg-white p-8 rounded-2xl border border-gray-200">
+                    <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Flexible Configuration</h3>
+                    <p class="text-gray-600">Customizable application fields, review processes, and validation rules based on business needs.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section id="process" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Application Process</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Complete vendor application in four simple steps with professional review team ensuring partnership quality
+                </p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span class="text-white font-bold text-xl">1</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Fill Application</h3>
+                    <p class="text-gray-600">Complete multi-step application form providing basic information, product details, and contact methods</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span class="text-white font-bold text-xl">2</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Auto Validation</h3>
+                    <p class="text-gray-600">System automatically validates key information to ensure data integrity and correct format</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span class="text-white font-bold text-xl">3</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Professional Review</h3>
+                    <p class="text-gray-600">Professional review team evaluates applications to ensure vendor quality and compliance</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span class="text-white font-bold text-xl">4</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Result Notification</h3>
+                    <p class="text-gray-600">Timely notification of review results, successful applicants can begin formal cooperation</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section id="stats" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">System Statistics</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Data-driven vendor management with continuously optimized partnership experience
+                </p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+                <div class="text-center p-8 bg-blue-50 rounded-2xl">
+                    <div class="text-4xl font-bold text-blue-600 mb-2" id="total-applications">0</div>
+                    <div class="text-gray-600">Total Applications</div>
+                </div>
+                <div class="text-center p-8 bg-green-50 rounded-2xl">
+                    <div class="text-4xl font-bold text-green-600 mb-2" id="success-rate">0%</div>
+                    <div class="text-gray-600">Approval Rate</div>
+                </div>
+                <div class="text-center p-8 bg-amber-50 rounded-2xl">
+                    <div class="text-4xl font-bold text-amber-600 mb-2" id="avg-process-time">0</div>
+                    <div class="text-gray-600">Avg Process Time (Days)</div>
+                </div>
+                <div class="text-center p-8 bg-purple-50 rounded-2xl">
+                    <div class="text-4xl font-bold text-purple-600 mb-2" id="active-vendors">0</div>
+                    <div class="text-gray-600">Active Vendors</div>
+                </div>
+            </div>
+            <div class="bg-gray-50 rounded-2xl p-8">
+                <h3 class="text-2xl font-semibold text-gray-900 mb-6 text-center">Monthly Application Trends</h3>
+                <div id="chart-container" style="width: 100%; height: 400px;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <div class="flex items-center justify-center space-x-3 mb-4">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-amber-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">V</span>
+                    </div>
+                    <span class="text-xl font-bold">VendorPortal</span>
+                </div>
+                <p class="text-gray-400 mb-4">Professional Vendor Application & Onboarding Process Management System</p>
+                <p class="text-gray-500 text-sm">© 2024 VendorPortal. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>

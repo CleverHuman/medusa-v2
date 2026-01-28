@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.ShippingAddressMapper">
+    <insert id="insertShippingAddress" parameterType="com.medusa.mall.domain.order.ShippingAddress">
+        INSERT INTO mall_order_shipping (
+            id, order_id, receiver_name, address_line1, address_line2, address_line3, city, state, post_code, country, create_time, shipping_method, remark
+        ) VALUES (
+            #{id}, #{orderId}, #{name}, #{address1}, #{address2}, #{address3}, #{city}, #{state}, #{postalCode}, #{country}, NOW(), #{shippingMethod}, #{remark}
+        )
+    </insert>
+
+    <select id="selectShippingAddressByOrderId" parameterType="String" resultType="com.medusa.mall.domain.order.ShippingAddress">
+        SELECT id, order_id as orderId, receiver_name as name, address_line1 as address1, address_line2 as address2, address_line3 as address3, 
+               city, state, post_code as postalCode, country, shipping_method as shippingMethod, shipping_number as shippingNumber, 
+               shipping_time as shippingTime, remark 
+        FROM mall_order_shipping 
+        WHERE order_id = #{orderId}
+    </select>
+
+    <update id="updateShippingInfoByOrderId" parameterType="com.medusa.mall.domain.order.ShippingAddress">
+        update mall_order_shipping
+        <set>
+            <if test="name != null">receiver_name = #{name},</if>
+            <if test="address1 != null">address_line1 = #{address1},</if>
+            <if test="address2 != null">address_line2 = #{address2},</if>
+            <if test="address3 != null">address_line3 = #{address3},</if>
+            <if test="city != null">city = #{city},</if>
+            <if test="state != null">state = #{state},</if>
+            <if test="postalCode != null">post_code = #{postalCode},</if>
+            <if test="country != null">country = #{country},</if>
+            <if test="shippingNumber != null">shipping_number = #{shippingNumber},</if>
+            <if test="shippingMethod != null">shipping_method = #{shippingMethod},</if>
+            <if test="shippingTime != null">shipping_time = #{shippingTime},</if>
+            update_time = NOW()
+        </set>
+        where order_id = #{orderId}
+    </update>
+</mapper>

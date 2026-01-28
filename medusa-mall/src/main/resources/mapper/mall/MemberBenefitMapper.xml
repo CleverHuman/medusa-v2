@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.MemberBenefitMapper">
+
+    <resultMap type="MemberBenefit" id="MemberBenefitResult">
+        <id property="levelId" column="level_id" />
+        <result property="levelName" column="level_name" />
+        <result property="point" column="point" />
+        <result property="des" column="des" />
+        <result property="fixedDiscount" column="fixed_discount" />
+        <result property="percentDiscount" column="percent_discount" />
+        <result property="shippingDiscount" column="shipping_discount" />
+        <result property="remark"         column="remark"  />
+    </resultMap>
+
+
+    <select id="selectMemberBenefitList" resultMap="MemberBenefitResult">
+        SELECT * FROM mall_member_benefit
+    </select>
+
+    <select id="selectMemberBenefitByLevelId" parameterType="Long" resultMap="MemberBenefitResult">
+        SELECT * FROM mall_member_benefit WHERE level_id = #{levelId}
+    </select>
+
+    <select id="selectAllMemberBenefitsOrderByPoint" resultMap="MemberBenefitResult">
+        SELECT * FROM mall_member_benefit ORDER BY point ASC
+    </select>
+
+    <insert id="insertMemberBenefit" parameterType="MemberBenefit">
+        INSERT INTO mall_member_benefit
+        (level_id, level_name, point, des, fixed_discount, percent_discount, shipping_discount, remark)
+        VALUES
+        (#{levelId}, #{levelName}, #{point}, #{des}, #{fixedDiscount}, #{percentDiscount}, #{shippingDiscount}, #{remark})
+    </insert>
+
+    <update id="updateMemberBenefit" parameterType="MemberBenefit">
+        UPDATE mall_member_benefit
+        SET level_name = #{levelName},
+            point = #{point},
+            des = #{des},
+            fixed_discount = #{fixedDiscount},
+            percent_discount = #{percentDiscount},
+            shipping_discount = #{shippingDiscount},
+            remark = #{remark}
+        WHERE level_id = #{levelId}
+    </update>
+
+</mapper>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-op Member Portal Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f172a, #1e293b, #111827);
+        }
+    </style>
+    <!-- Redirect to noscript version if JavaScript is disabled -->
+    <noscript>
+        <meta http-equiv="refresh" content="0;url=/mall/static/vendor/register?noscript=true">
+    </noscript>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center px-4 py-8">
+    <div class="w-full max-w-5xl grid md:grid-cols-2 gap-8 bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl">
+        <div class="hidden md:flex flex-col justify-between text-white space-y-6">
+            <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-white/20 rounded-full bg-white/5 backdrop-blur-sm mb-4">
+                    <span class="w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_0_3px_rgba(59,130,246,0.2)]"></span>
+                    <span class="text-sm font-semibold tracking-wide">Co-op Member Onboarding</span>
+                </div>
+                <h1 class="text-4xl font-bold mb-4">Become a Co-op Member (CM)</h1>
+                <p class="text-lg text-gray-200 leading-relaxed mb-4">
+                    Structured admission for serious participants. Bond-backed accountability, dispute resolution, and member governance — built to protect both buyers and members.
+                </p>
+                <div class="flex flex-wrap gap-2 mt-4">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-white/10 rounded-lg bg-white/5 text-sm font-semibold">
+                        <span>🛡</span> Bond-backed protection
+                    </div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-white/10 rounded-lg bg-white/5 text-sm font-semibold">
+                        <span>🗳</span> Governance & voting rights
+                    </div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-white/10 rounded-lg bg-white/5 text-sm font-semibold">
+                        <span>📈</span> Reputation-based trade capacity
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div class="bg-white/10 rounded-xl p-4 border border-white/10">
+                    <h3 class="text-lg font-semibold mb-2">Already registered?</h3>
+                    <p class="text-sm text-gray-200 mb-3">Log in to manage your application, view interview schedules, and monitor approval progress.</p>
+                    <a href="/mall/static/vendor/login" class="inline-block text-sm font-semibold text-green-400 hover:text-green-300 underline underline-offset-2">
+                        Member Login ↩
+                    </a>
+                </div>
+                <div class="space-y-3">
+                    <div class="text-xs font-bold tracking-wider text-gray-400 uppercase mb-2">What Happens Next</div>
+                    <div class="flex gap-3 items-start p-3 border border-white/10 rounded-lg bg-black/20">
+                        <div class="w-7 h-7 rounded-lg bg-white/10 border border-white/10 flex items-center justify-center font-black text-sm flex-shrink-0">1</div>
+                        <div>
+                            <div class="font-semibold text-sm mb-1">Register account</div>
+                            <div class="text-xs text-gray-300">Create a CM profile with verified contact details.</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 items-start p-3 border border-white/10 rounded-lg bg-black/20">
+                        <div class="w-7 h-7 rounded-lg bg-white/10 border border-white/10 flex items-center justify-center font-black text-sm flex-shrink-0">2</div>
+                        <div>
+                            <div class="font-semibold text-sm mb-1">Submit application</div>
+                            <div class="text-xs text-gray-300">Define regions, service scope, and operational readiness.</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 items-start p-3 border border-white/10 rounded-lg bg-black/20">
+                        <div class="w-7 h-7 rounded-lg bg-white/10 border border-white/10 flex items-center justify-center font-black text-sm flex-shrink-0">3</div>
+                        <div>
+                            <div class="font-semibold text-sm mb-1">Bond review & interview</div>
+                            <div class="text-xs text-gray-300">Bonding + checks ensure accountability and protect participants.</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 items-start p-3 border border-white/10 rounded-lg bg-black/20">
+                        <div class="w-7 h-7 rounded-lg bg-white/10 border border-white/10 flex items-center justify-center font-black text-sm flex-shrink-0">4</div>
+                        <div>
+                            <div class="font-semibold text-sm mb-1">Approval → Trading enabled</div>
+                            <div class="text-xs text-gray-300">Trade capacity becomes available based on level, bond, and reputation.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white/5 rounded-xl p-4 border border-white/10 space-y-2">
+                    <div class="flex gap-2 items-start text-sm font-bold">
+                        <span>🛡</span>
+                        <span>Bond-secured membership and enforcement</span>
+                    </div>
+                    <div class="flex gap-2 items-start text-sm font-bold">
+                        <span>⚖</span>
+                        <span>Dispute resolution by Co-op Admins</span>
+                    </div>
+                    <div class="flex gap-2 items-start text-sm font-bold">
+                        <span>🧯</span>
+                        <span>Liquidation safeguards: bond/withheld funds returned to victims</span>
+                    </div>
+                </div>
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
+                    <p class="text-sm text-amber-100 font-semibold leading-relaxed">
+                        ⚠ Co-op membership requires accountability, bonding, and adherence to collective rules. If you're looking for anonymous or low-commitment selling, this is not the right platform.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+            <div class="text-center">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-2">Create CM Account</h2>
+                <p class="text-sm text-gray-500">Register to start your Co-op Member application</p>
+            </div>
+            <form id="vendorRegisterForm" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">CM Username</label>
+                    <input id="registerUsername" type="text" required
+                           placeholder="Choose a username for your CM account"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                    <p class="text-xs text-gray-500 mt-1">Separate from standard customer accounts (scoped to your membership)</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input id="registerPassword" type="password" required
+                           placeholder="Create a secure password"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                    <input id="registerPasswordConfirm" type="password" required
+                           placeholder="Re-enter your password"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email (optional)</label>
+                    <input id="registerEmail" type="email"
+                           placeholder="For account recovery and notifications"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                </div>
+                <button type="submit"
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold shadow-lg">
+                    Create CM Account
+                </button>
+                <p class="text-sm text-center text-gray-500">
+                    Already have a CM account?
+                    <a href="#" id="gotoLogin" class="text-blue-600 hover:text-blue-700 font-medium">Member Login</a>
+                </p>
+            </form>
+            <div id="registerMessage" class="hidden text-center text-sm"></div>
+        </div>
+    </div>
+
+    <script th:src="@{/vendor/logger.js}"></script>
+    <script th:src="@{/vendor/api-config.js}"></script>
+    <script>
+        document.getElementById('gotoLogin').addEventListener('click', function (e) {
+            e.preventDefault();
+            window.location.href = '/mall/static/vendor/login';
+        });
+
+        document.getElementById('vendorRegisterForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const username = document.getElementById('registerUsername').value.trim();
+            const password = document.getElementById('registerPassword').value.trim();
+            const passwordConfirm = document.getElementById('registerPasswordConfirm').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const messageEl = document.getElementById('registerMessage');
+            messageEl.classList.add('hidden');
+
+            if (password !== passwordConfirm) {
+                messageEl.textContent = 'Passwords do not match.';
+                messageEl.className = 'text-center text-sm text-red-600';
+                messageEl.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const payload = {
+                    username,
+                    passwordHash: password,
+                    email: email || null
+                };
+                
+                const apiUrl = API.getURL('/api/mall/vendor/member/register');
+                console.log('Attempting registration with payload:', { username, email: email || 'none' });
+                console.log('API URL:', apiUrl);
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: API.buildHeaders(),
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+                
+                console.log('Response status:', response.status);
+                
+                // 检查响应状态
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('HTTP Error Response:', errorText);
+                    
+                    // 尝试解析JSON错误响应
+                    let errorMsg = `HTTP ${response.status}: Request failed`;
+                    try {
+                        const errorJson = JSON.parse(errorText);
+                        errorMsg = errorJson.msg || errorJson.message || errorMsg;
+                    } catch (e) {
+                        errorMsg = errorText || errorMsg;
+                    }
+                    
+                    messageEl.textContent = errorMsg;
+                    messageEl.className = 'text-center text-sm text-red-600';
+                    messageEl.classList.remove('hidden');
+                    return;
+                }
+                
+                const result = await response.json();
+                console.log('Registration result:', result);
+                
+                if (result.code === 200) {
+                    messageEl.textContent = 'Registration successful. Redirecting to login...';
+                    messageEl.className = 'text-center text-sm text-green-600';
+                    messageEl.classList.remove('hidden');
+                    setTimeout(() => {
+                        window.location.href = '/mall/static/vendor/login';
+                    }, 1200);
+                } else {
+                    messageEl.textContent = result.msg || 'Registration failed, please try again later.';
+                    messageEl.className = 'text-center text-sm text-red-600';
+                    messageEl.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Vendor register error:', error);
+                console.error('Error name:', error.name);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
+                
+                // 更详细的错误信息
+                let errorMsg = 'Registration failed, please try again later.';
+                if (error.message && error.message.includes('Failed to fetch')) {
+                    errorMsg = 'Network error. Please check your connection and try again.';
+                } else if (error.message && error.message.includes('timeout')) {
+                    errorMsg = 'Request timeout. Please try again.';
+                } else if (error.message) {
+                    errorMsg = `Registration failed: ${error.message}`;
+                }
+                
+                messageEl.textContent = errorMsg;
+                messageEl.className = 'text-center text-sm text-red-600';
+                messageEl.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.MemberLevelMapper">
+
+    <resultMap type="MemberLevel" id="MemberLevelResult">
+        <id property="id" column="info_id" />
+        <result property="memberId" column="member_id" />
+        <result property="totalOrders" column="total_orders" />
+        <result property="currentLevel" column="current_level" />
+        <result property="currentPoint" column="current_point" />
+        <result property="currentAud" column="current_aud" />
+        <result property="lastLevel" column="last_level" />
+        <result property="lastPoint" column="last_point" />
+        <result property="lastAud" column="last_aud" />
+        <result property="updateBy"       column="update_by"       />
+        <result property="updateTime"     column="update_time"     />
+        <result property="remark"         column="remark"  />
+    </resultMap>
+
+    <insert id="insertMemberLevel" parameterType="MemberLevel">
+        insert into mall_member_level (member_id, update_time)
+        values (#{memberId}, sysdate())
+    </insert>
+
+    <update id="updateMemberLevel" parameterType="MemberLevel">
+        update mall_member_level
+        <set>
+            <if test="currentLevel != null and currentLevel != ''">current_level = #{currentLevel},</if>
+            <if test="currentPoint != null">current_point = #{currentPoint},</if>
+            <if test="currentAud != null">current_aud = #{currentAud},</if>
+            <if test="lastLevel != null and lastLevel != ''">last_level = #{lastLevel},</if>
+            <if test="lastPoint != null">last_point = #{lastPoint},</if>
+            <if test="lastAud != null">last_aud = #{lastAud},</if>
+            <if test="totalOrders != null and totalOrders != ''">total_orders = #{totalOrders},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where member_id = #{memberId}
+    </update>
+
+
+    <update id="batchupdateMemberLevel" parameterType="map">
+        UPDATE mall_member_level
+        SET current_level = #{level}
+        WHERE member_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="selectMemberLevelByMemberId" parameterType="Long" resultMap="MemberLevelResult">
+        SELECT * FROM mall_member_level WHERE member_id = #{memberId}
+    </select>
+
+    <select id="selectAllMemberLevels" resultType="com.medusa.mall.domain.member.MemberLevel">
+        SELECT 
+            id,
+            level_name as levelName,
+            point_requirement as pointRequirement,
+            description,
+            status,
+            create_time as createTime,
+            update_time as updateTime
+        FROM mall_member_level_rule 
+        WHERE status = '0' 
+        ORDER BY point_requirement ASC
+    </select>
+
+</mapper>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.PaymentMapper">
+    <resultMap id="PaymentResult" type="com.medusa.mall.domain.order.Payment">
+        <result property="id" column="id" />
+        <result property="orderId" column="order_id" />
+        <result property="paymentNo" column="transaction_id" />
+        <result property="payType" column="pay_type" />
+        <result property="amount" column="pay_amount" />
+        <result property="currency" column="currency" />
+        <result property="payStatus" column="payment_status" />
+        <result property="payTime" column="pay_time" />
+        <result property="remark" column="remark" />
+        <result property="rate" column="rate" />
+        <result property="totalcoin" column="totalcoin" />
+        <result property="paidcoin" column="paidcoin" />
+    </resultMap>
+
+    <select id="selectPaymentByOrderId" parameterType="String" resultMap="PaymentResult">
+        select * from mall_order_payment where order_id = #{orderId}
+    </select>
+
+    <insert id="insertPayment" parameterType="com.medusa.mall.domain.order.Payment">
+        insert into mall_order_payment (
+            id,
+            order_id,
+            transaction_id,
+            pay_type,
+            pay_amount,
+            currency,
+            payment_status,
+            rate,
+            paidcoin,
+            totalcoin,
+            pay_time,
+            remark
+        ) values (
+            #{id},
+            #{orderId},
+            #{paymentNo},
+            #{payType},
+            #{amount},
+            #{currency},
+            #{payStatus},
+            #{rate},
+            #{paidcoin},
+            #{totalcoin},
+            #{payTime},
+            #{remark}
+        )
+    </insert>
+
+    <update id="updatePayment" parameterType="com.medusa.mall.domain.order.Payment">
+        update mall_order_payment
+        set transaction_id = #{paymentNo},
+            payment_status = #{payStatus},
+            pay_time = #{payTime},
+            remark = #{remark},
+            paidcoin = #{paidcoin}
+        where order_id = #{orderId}
+    </update>
+
+    <delete id="deletePaymentById" parameterType="String">
+        delete from mall_order_payment where id = #{id}
+    </delete>
+
+    <delete id="deletePaymentByOrderId" parameterType="String">
+        delete from mall_order_payment where order_id = #{orderId}
+    </delete>
+    
+    <select id="selectPendingPayments" resultMap="PaymentResult">
+        select * from mall_order_payment 
+        where payment_status = 0 
+        and pay_time &gt; DATE_SUB(NOW(), INTERVAL 60 MINUTE)
+        and pay_type != '4'
+        order by pay_time desc
+    </select>
+
+    <select id="selectExpiredPayments" resultMap="PaymentResult">
+        select * from mall_order_payment 
+        where payment_status = 0 
+        and pay_time &lt;= DATE_SUB(NOW(), INTERVAL 60 MINUTE)
+        and pay_type != '4'
+        order by pay_time desc
+    </select>
+
+    <select id="selectPendingNowPaymentsPayments" resultMap="PaymentResult">
+        select * from mall_order_payment 
+        where pay_type = '1' 
+        and payment_status = 0 
+        and transaction_id is not null 
+        and transaction_id != ''
+        and pay_time &gt; DATE_SUB(NOW(), INTERVAL 1 HOUR)
+        order by pay_time asc
+    </select>
+
+    <select id="selectExpiredNowPaymentsPayments" resultMap="PaymentResult">
+        select * from mall_order_payment 
+        where pay_type = '1' 
+        and payment_status = 0 
+        and transaction_id is not null 
+        and transaction_id != ''
+        and pay_time &lt;= DATE_SUB(NOW(), INTERVAL 1 HOUR)
+        order by pay_time asc
+    </select>
+
+</mapper> 

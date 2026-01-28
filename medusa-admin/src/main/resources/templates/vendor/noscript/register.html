@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-op Member Portal Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b, #111827);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+        .container {
+            width: 100%;
+            max-width: 80rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        @media (min-width: 768px) {
+            .container { grid-template-columns: 1fr 1fr; }
+            .sidebar { display: flex; }
+        }
+        .sidebar {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            color: white;
+            gap: 1.5rem;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            margin-bottom: 1rem;
+        }
+        .badge-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 9999px;
+            background: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .badge-text {
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .lead {
+            font-size: 1.125rem;
+            color: #e5e7eb;
+            line-height: 1.75;
+            margin-bottom: 1rem;
+        }
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        .info-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .info-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .info-box h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .info-box p {
+            font-size: 0.875rem;
+            color: #e5e7eb;
+            margin-bottom: 0.75rem;
+        }
+        .info-box a {
+            display: inline-block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #4ade80;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        .info-box a:hover {
+            color: #22c55e;
+        }
+        .steps-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #9ca3af;
+            margin-bottom: 0.5rem;
+        }
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .step-item {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .step-number {
+            width: 1.75rem;
+            height: 1.75rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+        .step-content h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .step-content p {
+            font-size: 0.75rem;
+            color: #d1d5db;
+        }
+        .features-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .feature-item {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 0.75rem;
+            padding: 1rem;
+        }
+        .warning-box p {
+            font-size: 0.875rem;
+            color: #fef3c7;
+            font-weight: 600;
+            line-height: 1.75;
+        }
+        .form-container {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .form-header {
+            text-align: center;
+        }
+        .form-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+        .form-header p {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        .alert {
+            padding: 1rem;
+            border-radius: 0.25rem;
+            border-left-width: 4px;
+        }
+        .alert-error {
+            background: #fef2f2;
+            border-color: #f87171;
+        }
+        .alert-error p {
+            font-size: 0.875rem;
+            color: #991b1b;
+        }
+        .alert-success {
+            background: #f0fdf4;
+            border-color: #4ade80;
+        }
+        .alert-success p {
+            font-size: 0.875rem;
+            color: #166534;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+        .form-field {
+            display: block;
+        }
+        .form-field label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+        .form-field input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            outline: none;
+        }
+        .form-field input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+        .form-field p {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        .btn {
+            width: 100%;
+            background: #2563eb;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .btn:hover {
+            background: #1d4ed8;
+        }
+        .form-footer {
+            font-size: 0.875rem;
+            text-align: center;
+            color: #6b7280;
+        }
+        .form-footer a {
+            color: #2563eb;
+            font-weight: 500;
+        }
+        .form-footer a:hover {
+            color: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div>
+                <div class="badge">
+                    <span class="badge-dot"></span>
+                    <span class="badge-text">Co-op Member Onboarding</span>
+                </div>
+                <h1>Become a Co-op Member (CM)</h1>
+                <p class="lead">
+                    Structured admission for serious participants. Bond-backed accountability, dispute resolution, and member governance — built to protect both buyers and members.
+                </p>
+                <div class="tags">
+                    <div class="tag">
+                        <span>🛡</span> Bond-backed protection
+                    </div>
+                    <div class="tag">
+                        <span>🗳</span> Governance & voting rights
+                    </div>
+                    <div class="tag">
+                        <span>📈</span> Reputation-based trade capacity
+                    </div>
+                </div>
+            </div>
+            <div class="info-section">
+                <div class="info-box">
+                    <h3>Already registered?</h3>
+                    <p>Log in to manage your application, view interview schedules, and monitor approval progress.</p>
+                    <a href="/mall/static/vendor/login">
+                        Member Login ↩
+                    </a>
+                </div>
+                <div>
+                    <div class="steps-title">What Happens Next</div>
+                    <div class="steps-list">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Register account</h4>
+                                <p>Create a CM profile with verified contact details.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Submit application</h4>
+                                <p>Define regions, service scope, and operational readiness.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Bond review & interview</h4>
+                                <p>Bonding + checks ensure accountability and protect participants.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Approval → Trading enabled</h4>
+                                <p>Trade capacity becomes available based on level, bond, and reputation.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="features-box">
+                    <div class="feature-item">
+                        <span>🛡</span>
+                        <span>Bond-secured membership and enforcement</span>
+                    </div>
+                    <div class="feature-item">
+                        <span>⚖</span>
+                        <span>Dispute resolution by Co-op Admins</span>
+                    </div>
+                    <div class="feature-item">
+                        <span>🧯</span>
+                        <span>Liquidation safeguards: bond/withheld funds returned to victims</span>
+                    </div>
+                </div>
+                <div class="warning-box">
+                    <p>
+                        ⚠ Co-op membership requires accountability, bonding, and adherence to collective rules. If you're looking for anonymous or low-commitment selling, this is not the right platform.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <div class="form-header">
+                <h2>Create CM Account</h2>
+                <p>Register to start your Co-op Member application</p>
+            </div>
+
+            <!-- Error Message -->
+            <div th:if="${error}" class="alert alert-error">
+                <p th:text="${error}">Error message</p>
+            </div>
+
+            <!-- Success Message -->
+            <div th:if="${message}" class="alert alert-success">
+                <p th:text="${message}">Success message</p>
+            </div>
+
+            <form method="post" action="/mall/static/vendor/register" class="form-group">
+                <div class="form-field">
+                    <label for="username">CM Username *</label>
+                    <input id="username" name="username" type="text" required
+                           placeholder="Choose a username for your CM account"
+                           th:value="${username}">
+                    <p>Separate from standard customer accounts (scoped to your membership)</p>
+                </div>
+                <div class="form-field">
+                    <label for="password">Password *</label>
+                    <input id="password" name="password" type="password" required
+                           placeholder="Create a secure password">
+                </div>
+                <div class="form-field">
+                    <label for="passwordConfirm">Confirm Password *</label>
+                    <input id="passwordConfirm" name="passwordConfirm" type="password" required
+                           placeholder="Re-enter your password">
+                </div>
+                <div class="form-field">
+                    <label for="email">Email (optional)</label>
+                    <input id="email" name="email" type="email"
+                           placeholder="For account recovery and notifications"
+                           th:value="${email}">
+                </div>
+                <button type="submit" class="btn">
+                    Create CM Account
+                </button>
+                <p class="form-footer">
+                    Already have a CM account?
+                    <a href="/mall/static/vendor/login">Member Login</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

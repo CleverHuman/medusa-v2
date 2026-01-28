@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.ProductMapper">
+    <resultMap type="Product" id="ProductResult">
+        <result property="id"    column="id"    />
+        <result property="productId"    column="product_id"    />
+        <result property="category"    column="category"    />
+        <result property="categoryId"    column="category_id"    />
+        <result property="name"    column="name"    />
+        <result property="description"    column="description"    />
+        <result property="imageUrl"    column="image_url"    />
+        <result property="brand"    column="brand"    />
+        <result property="status"    column="status"    />
+        <result property="approvalStatus"    column="approval_status"    />
+        <result property="rejectionReason"    column="rejection_reason"    />
+        <result property="approvedTime"    column="approved_time"    />
+        <result property="approvedBy"    column="approved_by"    />
+        <result property="shopId"    column="shop_id"    />
+        <result property="channel"    column="channel"    />
+        <result property="productOrigin"    column="product_origin"    />
+        <result property="originId"    column="origin_id"    />
+        <result property="sortOrder"    column="sort_order"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectProductVo">
+        select id, product_id, category, category_id, name, description, image_url, brand, status, approval_status, rejection_reason, approved_time, approved_by, shop_id, channel, product_origin, origin_id, sort_order, create_by, create_time, update_by, update_time, remark from mall_product
+    </sql>
+
+    <select id="selectProductList" parameterType="Product" resultMap="ProductResult">
+        <include refid="selectProductVo"/>
+        <where>  
+            <if test="productId != null  and productId != ''"> and product_id = #{productId}</if>
+            <if test="category != null  and category != ''"> and category = #{category}</if>
+            <if test="categoryId != null "> and category_id = #{categoryId}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="approvalStatus != null and approvalStatus != ''"> and approval_status = #{approvalStatus}</if>
+            <if test="shopId != null "> and shop_id = #{shopId}</if>
+            <if test="channel != null  and channel != ''"> and channel = #{channel}</if>
+            <if test="productOrigin != null "> and product_origin = #{productOrigin}</if>
+            <if test="originId != null "> and origin_id = #{originId}</if>
+            and status != '2'
+        </where>
+        order by sort_order asc, create_time desc
+    </select>
+    
+    <select id="selectProductById" parameterType="Long" resultMap="ProductResult">
+        <include refid="selectProductVo"/>
+        where id = #{id} and status != '2'
+    </select>
+
+    <select id="selectProductByProductId" parameterType="String" resultMap="ProductResult">
+        <include refid="selectProductVo"/>
+        where product_id = #{productId} and status != '2'
+    </select>
+        
+    <insert id="insertProduct" parameterType="Product" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productId != null">product_id,</if>
+            <if test="category != null">category,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="name != null">name,</if>
+            <if test="description != null">description,</if>
+            <if test="imageUrl != null">image_url,</if>
+            <if test="brand != null">brand,</if>
+            <if test="status != null">status,</if>
+            <if test="approvalStatus != null">approval_status,</if>
+            <if test="rejectionReason != null">rejection_reason,</if>
+            <if test="approvedTime != null">approved_time,</if>
+            <if test="approvedBy != null">approved_by,</if>
+            <if test="shopId != null">shop_id,</if>
+            <if test="channel != null">channel,</if>
+            <if test="productOrigin != null">product_origin,</if>
+            <if test="originId != null">origin_id,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productId != null">#{productId},</if>
+            <if test="category != null">#{category},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="name != null">#{name},</if>
+            <if test="description != null">#{description},</if>
+            <if test="imageUrl != null">#{imageUrl},</if>
+            <if test="brand != null">#{brand},</if>
+            <if test="status != null">#{status},</if>
+            <if test="approvalStatus != null">#{approvalStatus},</if>
+            <if test="rejectionReason != null">#{rejectionReason},</if>
+            <if test="approvedTime != null">#{approvedTime},</if>
+            <if test="approvedBy != null">#{approvedBy},</if>
+            <if test="shopId != null">#{shopId},</if>
+            <if test="channel != null">#{channel},</if>
+            <if test="productOrigin != null">#{productOrigin},</if>
+            <if test="originId != null">#{originId},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateProduct" parameterType="Product">
+        update mall_product
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="imageUrl != null">image_url = #{imageUrl},</if>
+            <if test="brand != null">brand = #{brand},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="approvalStatus != null">approval_status = #{approvalStatus},</if>
+            <if test="rejectionReason != null">rejection_reason = #{rejectionReason},</if>
+            <if test="approvedTime != null">approved_time = #{approvedTime},</if>
+            <if test="approvedBy != null">approved_by = #{approvedBy},</if>
+            <if test="shopId != null">shop_id = #{shopId},</if>
+            <if test="channel != null">channel = #{channel},</if>
+            <if test="productOrigin != null">product_origin = #{productOrigin},</if>
+            <if test="originId != null">origin_id = #{originId},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProductById" parameterType="Long">
+        delete from mall_product where id = #{id}
+    </delete>
+
+    <delete id="deleteProductByIds" parameterType="String">
+        delete from mall_product where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectAllCategories" resultType="String">
+        select distinct category from mall_product where status != '2'
+    </select>
+
+    <select id="selectProductsByCategory" parameterType="String" resultMap="ProductResult">
+        <include refid="selectProductVo"/>
+        where category = #{category} and status != '2'
+        order by sort_order asc, create_time desc
+    </select>
+
+    <select id="selectProductsByCategoryId" parameterType="Long" resultMap="ProductResult">
+        <include refid="selectProductVo"/>
+        where category_id = #{categoryId} and status != '2'
+        order by sort_order asc, create_time desc
+    </select>
+
+    <!-- Update single product sort order -->
+    <update id="updateProductSortOrder" parameterType="Product">
+        UPDATE mall_product SET sort_order = #{sortOrder} WHERE id = #{id}
+    </update>
+
+</mapper>

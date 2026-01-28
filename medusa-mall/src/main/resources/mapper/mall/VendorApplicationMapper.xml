@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.VendorApplicationMapper">
+    
+    <resultMap type="com.medusa.mall.domain.vendor.VendorApplication" id="VendorApplicationResult">
+        <id     property="id"                    column="id"                     />
+        <result property="memberId"              column="member_id"              />
+        <result property="applicationId"         column="application_id"         />
+        <result property="vendorName"            column="vendor_name"            />
+        <result property="hasMarketExperience"   column="has_market_experience"  />
+        <result property="existingMarkets"       column="existing_markets"       />
+        <result property="experienceYears"       column="experience_years"       />
+        <result property="pgpSignatureUrl"       column="pgp_signature_url"      />
+        <result property="btcWallet"             column="btc_wallet"             />
+        <result property="xmrWallet"             column="xmr_wallet"             />
+        <result property="usdtWallet"            column="usdt_wallet"            />
+        <result property="location"              column="location"               />
+        <result property="productCategories"     column="product_categories"     />
+        <result property="stockVolume"           column="stock_volume"           />
+        <result property="offlineDelivery"       column="offline_delivery"       />
+        <result property="productDescription"    column="product_description"    />
+        <result property="primaryTelegram"       column="primary_telegram"       />
+        <result property="primarySignal"         column="primary_signal"         />
+        <result property="primaryJabber"         column="primary_jabber"         />
+        <result property="primaryEmail"          column="primary_email"          />
+        <result property="primaryThreema"       column="primary_threema"        />
+        <result property="secondaryTelegram"     column="secondary_telegram"     />
+        <result property="secondarySignal"       column="secondary_signal"       />
+        <result property="secondaryJabber"       column="secondary_jabber"       />
+        <result property="secondaryEmail"        column="secondary_email"        />
+        <result property="secondaryThreema"      column="secondary_threema"       />
+        <result property="status"                column="status"                 />
+        <result property="reviewNotes"           column="review_notes"           />
+        <result property="reviewerId"            column="reviewer_id"            />
+        <result property="reviewedTime"          column="reviewed_time"          />
+        <result property="reviewStage"           column="review_stage"           />
+        <result property="reviewProgress"        column="review_progress"        />
+        <result property="vendorId"              column="vendor_id"              />
+        <result property="bondLevel"             column="bond_level"             />
+        <result property="bondOrderId"           column="bond_order_id"          />
+        <result property="bondPaidTime"          column="bond_paid_time"         />
+        <result property="walletBtcProvided"     column="wallet_btc_provided"    />
+        <result property="walletXmrProvided"     column="wallet_xmr_provided"    />
+        <result property="walletUsdtProvided"    column="wallet_usdt_provided"   />
+        <result property="walletVerifiedTime"    column="wallet_verified_time"   />
+        <result property="walletVerifiedBy"      column="wallet_verified_by"     />
+        <result property="hasScheduledInterview" column="has_scheduled_interview"/>
+        <result property="nextInterviewTime"     column="next_interview_time"    />
+        <result property="createTime"            column="create_time"            />
+        <result property="updateTime"            column="update_time"            />
+        <result property="createBy"              column="create_by"              />
+        <result property="updateBy"              column="update_by"              />
+        <result property="remark"                column="remark"                 />
+    </resultMap>
+
+    <sql id="selectVendorApplicationVo">
+        select id, member_id, application_id, vendor_name, has_market_experience, existing_markets, 
+               experience_years, pgp_signature_url, btc_wallet, xmr_wallet, usdt_wallet, 
+               location, product_categories, stock_volume, offline_delivery, product_description,
+               primary_telegram, primary_signal, primary_jabber, primary_email, primary_threema,
+               secondary_telegram, secondary_signal, secondary_jabber, secondary_email, secondary_threema,
+               status, review_notes, reviewer_id, reviewed_time, review_stage, review_progress,
+               vendor_id, bond_level, bond_order_id, bond_paid_time, 
+               wallet_btc_provided, wallet_xmr_provided, wallet_usdt_provided,
+               wallet_verified_time, wallet_verified_by,
+               has_scheduled_interview, next_interview_time,
+               create_time, update_time, create_by, update_by, remark, del_flag
+        from mall_vendor_application
+    </sql>
+
+    <select id="selectVendorApplicationList" parameterType="com.medusa.mall.domain.vendor.VendorApplication" resultMap="VendorApplicationResult">
+        <include refid="selectVendorApplicationVo"/>
+        <where>
+            del_flag = '0'
+            <if test="memberId != null">
+                AND member_id = #{memberId}
+            </if>
+            <if test="applicationId != null and applicationId != ''">
+                AND application_id like concat('%', #{applicationId}, '%')
+            </if>
+            <if test="vendorName != null and vendorName != ''">
+                AND vendor_name like concat('%', #{vendorName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="location != null and location != ''">
+                AND location = #{location}
+            </if>
+            <if test="reviewerId != null">
+                AND reviewer_id = #{reviewerId}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectVendorApplicationById" parameterType="Long" resultMap="VendorApplicationResult">
+        <include refid="selectVendorApplicationVo"/>
+        where id = #{id} and del_flag = '0'
+    </select>
+
+    <select id="selectByApplicationId" parameterType="String" resultMap="VendorApplicationResult">
+        <include refid="selectVendorApplicationVo"/>
+        where application_id = #{applicationId} and del_flag = '0'
+    </select>
+
+    <select id="selectByApplicationIdAndMemberId" resultMap="VendorApplicationResult">
+        <include refid="selectVendorApplicationVo"/>
+        where application_id = #{applicationId}
+          and member_id = #{memberId}
+          and del_flag = '0'
+    </select>
+
+    <insert id="insertVendorApplication" parameterType="com.medusa.mall.domain.vendor.VendorApplication" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_vendor_application
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">member_id,</if>
+            <if test="applicationId != null and applicationId != ''">application_id,</if>
+            <if test="vendorName != null and vendorName != ''">vendor_name,</if>
+            <if test="hasMarketExperience != null">has_market_experience,</if>
+            <if test="existingMarkets != null">existing_markets,</if>
+            <if test="experienceYears != null">experience_years,</if>
+            <if test="pgpSignatureUrl != null">pgp_signature_url,</if>
+            <if test="btcWallet != null">btc_wallet,</if>
+            <if test="xmrWallet != null">xmr_wallet,</if>
+            <if test="usdtWallet != null">usdt_wallet,</if>
+            <if test="location != null">location,</if>
+            <if test="productCategories != null">product_categories,</if>
+            <if test="stockVolume != null">stock_volume,</if>
+            <if test="offlineDelivery != null">offline_delivery,</if>
+            <if test="productDescription != null">product_description,</if>
+            <if test="primaryTelegram != null">primary_telegram,</if>
+            <if test="primarySignal != null">primary_signal,</if>
+            <if test="primaryJabber != null">primary_jabber,</if>
+            <if test="primaryEmail != null">primary_email,</if>
+            <if test="primaryThreema != null">primary_threema,</if>
+            <if test="secondaryTelegram != null">secondary_telegram,</if>
+            <if test="secondarySignal != null">secondary_signal,</if>
+            <if test="secondaryJabber != null">secondary_jabber,</if>
+            <if test="secondaryEmail != null">secondary_email,</if>
+            <if test="secondaryThreema != null">secondary_threema,</if>
+            <if test="status != null">status,</if>
+            <if test="reviewNotes != null">review_notes,</if>
+            <if test="reviewerId != null">reviewer_id,</if>
+            <if test="reviewedTime != null">reviewed_time,</if>
+            <if test="reviewStage != null">review_stage,</if>
+            <if test="reviewProgress != null">review_progress,</if>
+            <if test="vendorId != null">vendor_id,</if>
+            <if test="bondLevel != null">bond_level,</if>
+            <if test="bondOrderId != null and bondOrderId != ''">bond_order_id,</if>
+            <if test="bondPaidTime != null">bond_paid_time,</if>
+            <if test="walletBtcProvided != null and walletBtcProvided != ''">wallet_btc_provided,</if>
+            <if test="walletXmrProvided != null and walletXmrProvided != ''">wallet_xmr_provided,</if>
+            <if test="walletUsdtProvided != null and walletUsdtProvided != ''">wallet_usdt_provided,</if>
+            <if test="walletVerifiedTime != null">wallet_verified_time,</if>
+            <if test="walletVerifiedBy != null and walletVerifiedBy != ''">wallet_verified_by,</if>
+            <if test="hasScheduledInterview != null">has_scheduled_interview,</if>
+            <if test="nextInterviewTime != null">next_interview_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">#{memberId},</if>
+            <if test="applicationId != null and applicationId != ''">#{applicationId},</if>
+            <if test="vendorName != null and vendorName != ''">#{vendorName},</if>
+            <if test="hasMarketExperience != null">#{hasMarketExperience},</if>
+            <if test="existingMarkets != null">#{existingMarkets},</if>
+            <if test="experienceYears != null">#{experienceYears},</if>
+            <if test="pgpSignatureUrl != null">#{pgpSignatureUrl},</if>
+            <if test="btcWallet != null">#{btcWallet},</if>
+            <if test="xmrWallet != null">#{xmrWallet},</if>
+            <if test="usdtWallet != null">#{usdtWallet},</if>
+            <if test="location != null">#{location},</if>
+            <if test="productCategories != null">#{productCategories},</if>
+            <if test="stockVolume != null">#{stockVolume},</if>
+            <if test="offlineDelivery != null">#{offlineDelivery},</if>
+            <if test="productDescription != null">#{productDescription},</if>
+            <if test="primaryTelegram != null">#{primaryTelegram},</if>
+            <if test="primarySignal != null">#{primarySignal},</if>
+            <if test="primaryJabber != null">#{primaryJabber},</if>
+            <if test="primaryEmail != null">#{primaryEmail},</if>
+            <if test="primaryThreema != null">#{primaryThreema},</if>
+            <if test="secondaryTelegram != null">#{secondaryTelegram},</if>
+            <if test="secondarySignal != null">#{secondarySignal},</if>
+            <if test="secondaryJabber != null">#{secondaryJabber},</if>
+            <if test="secondaryEmail != null">#{secondaryEmail},</if>
+            <if test="secondaryThreema != null">#{secondaryThreema},</if>
+            <if test="status != null">#{status},</if>
+            <if test="reviewNotes != null">#{reviewNotes},</if>
+            <if test="reviewerId != null">#{reviewerId},</if>
+            <if test="reviewedTime != null">#{reviewedTime},</if>
+            <if test="reviewStage != null">#{reviewStage},</if>
+            <if test="reviewProgress != null">#{reviewProgress},</if>
+            <if test="vendorId != null">#{vendorId},</if>
+            <if test="bondLevel != null">#{bondLevel},</if>
+            <if test="bondOrderId != null and bondOrderId != ''">#{bondOrderId},</if>
+            <if test="bondPaidTime != null">#{bondPaidTime},</if>
+            <if test="walletBtcProvided != null and walletBtcProvided != ''">#{walletBtcProvided},</if>
+            <if test="walletXmrProvided != null and walletXmrProvided != ''">#{walletXmrProvided},</if>
+            <if test="walletUsdtProvided != null and walletUsdtProvided != ''">#{walletUsdtProvided},</if>
+            <if test="walletVerifiedTime != null">#{walletVerifiedTime},</if>
+            <if test="walletVerifiedBy != null and walletVerifiedBy != ''">#{walletVerifiedBy},</if>
+            <if test="hasScheduledInterview != null">#{hasScheduledInterview},</if>
+            <if test="nextInterviewTime != null">#{nextInterviewTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateVendorApplication" parameterType="com.medusa.mall.domain.vendor.VendorApplication">
+        update mall_vendor_application
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="memberId != null">member_id = #{memberId},</if>
+            <if test="vendorName != null and vendorName != ''">vendor_name = #{vendorName},</if>
+            <if test="hasMarketExperience != null">has_market_experience = #{hasMarketExperience},</if>
+            <if test="existingMarkets != null">existing_markets = #{existingMarkets},</if>
+            <if test="experienceYears != null">experience_years = #{experienceYears},</if>
+            <if test="pgpSignatureUrl != null">pgp_signature_url = #{pgpSignatureUrl},</if>
+            <if test="btcWallet != null">btc_wallet = #{btcWallet},</if>
+            <if test="xmrWallet != null">xmr_wallet = #{xmrWallet},</if>
+            <if test="usdtWallet != null">usdt_wallet = #{usdtWallet},</if>
+            <if test="location != null">location = #{location},</if>
+            <if test="productCategories != null">product_categories = #{productCategories},</if>
+            <if test="stockVolume != null">stock_volume = #{stockVolume},</if>
+            <if test="offlineDelivery != null">offline_delivery = #{offlineDelivery},</if>
+            <if test="productDescription != null">product_description = #{productDescription},</if>
+            <if test="primaryTelegram != null">primary_telegram = #{primaryTelegram},</if>
+            <if test="primarySignal != null">primary_signal = #{primarySignal},</if>
+            <if test="primaryJabber != null">primary_jabber = #{primaryJabber},</if>
+            <if test="primaryEmail != null">primary_email = #{primaryEmail},</if>
+            <if test="primaryThreema != null">primary_threema = #{primaryThreema},</if>
+            <if test="secondaryTelegram != null">secondary_telegram = #{secondaryTelegram},</if>
+            <if test="secondarySignal != null">secondary_signal = #{secondarySignal},</if>
+            <if test="secondaryJabber != null">secondary_jabber = #{secondaryJabber},</if>
+            <if test="secondaryEmail != null">secondary_email = #{secondaryEmail},</if>
+            <if test="secondaryThreema != null">secondary_threema = #{secondaryThreema},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="reviewNotes != null">review_notes = #{reviewNotes},</if>
+            <if test="reviewerId != null">reviewer_id = #{reviewerId},</if>
+            <if test="reviewedTime != null">reviewed_time = #{reviewedTime},</if>
+            <if test="reviewStage != null">review_stage = #{reviewStage},</if>
+            <if test="reviewProgress != null">review_progress = #{reviewProgress},</if>
+            <if test="vendorId != null">vendor_id = #{vendorId},</if>
+            <if test="bondLevel != null">bond_level = #{bondLevel},</if>
+            <if test="bondOrderId != null">bond_order_id = #{bondOrderId},</if>
+            <if test="bondPaidTime != null">bond_paid_time = #{bondPaidTime},</if>
+            <if test="walletBtcProvided != null">wallet_btc_provided = #{walletBtcProvided},</if>
+            <if test="walletXmrProvided != null">wallet_xmr_provided = #{walletXmrProvided},</if>
+            <if test="walletUsdtProvided != null">wallet_usdt_provided = #{walletUsdtProvided},</if>
+            <if test="walletVerifiedTime != null">wallet_verified_time = #{walletVerifiedTime},</if>
+            <if test="walletVerifiedBy != null">wallet_verified_by = #{walletVerifiedBy},</if>
+            <if test="hasScheduledInterview != null">has_scheduled_interview = #{hasScheduledInterview},</if>
+            <if test="nextInterviewTime != null">next_interview_time = #{nextInterviewTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteVendorApplicationById" parameterType="Long">
+        update mall_vendor_application set del_flag = '2' where id = #{id}
+    </delete>
+
+    <delete id="deleteVendorApplicationByIds" parameterType="Long">
+        update mall_vendor_application set del_flag = '2' where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectApprovedByMemberId" parameterType="Long" resultMap="VendorApplicationResult">
+        <include refid="selectVendorApplicationVo"/>
+        where member_id = #{memberId} and del_flag = '0' and status = 'approved'
+        order by create_time desc
+        limit 1
+    </select>
+</mapper>
+

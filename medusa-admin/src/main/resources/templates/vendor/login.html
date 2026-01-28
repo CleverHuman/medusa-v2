@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-op Member Portal Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f172a, #1e293b, #111827);
+        }
+    </style>
+    <!-- Redirect to noscript version if JavaScript is disabled -->
+    <noscript>
+        <meta http-equiv="refresh" content="0;url=/mall/static/vendor/login?noscript=true">
+    </noscript>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center px-4 py-8">
+    <div class="w-full max-w-5xl grid md:grid-cols-2 gap-8 bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl">
+        <div class="hidden md:flex flex-col justify-between text-white space-y-6">
+            <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-white/20 rounded-full bg-white/5 backdrop-blur-sm mb-4">
+                    <span class="w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_0_3px_rgba(59,130,246,0.2)]"></span>
+                    <span class="text-sm font-semibold tracking-wide">Co-op Member Portal</span>
+                </div>
+                <h1 class="text-4xl font-bold mb-4">Returning Co-op Member</h1>
+                <p class="text-lg text-gray-200 leading-relaxed mb-4">
+                    Log in to manage your membership application, view interview schedules, upload required documents, and monitor approval progress. Your CM account is separate from standard customer accounts, scoped to your membership.
+                </p>
+                <div class="flex flex-wrap gap-2 mt-4">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-white/10 rounded-lg bg-white/5 text-sm font-semibold">
+                        <span>🛡</span> Bond-backed protection
+                    </div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-white/10 rounded-lg bg-white/5 text-sm font-semibold">
+                        <span>⚖</span> Dispute resolution
+                    </div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-white/10 rounded-lg bg-white/5 text-sm font-semibold">
+                        <span>🗳</span> Governance rights
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div class="bg-white/10 rounded-xl p-4 border border-white/10">
+                    <h3 class="text-lg font-semibold mb-2">New to the Co-op?</h3>
+                    <p class="text-sm text-gray-200 mb-3">Create your CM account and submit a membership application. You'll be guided through bonding, eligibility checks, and any required interview steps.</p>
+                    <a href="/mall/static/vendor/register" class="inline-block text-sm font-semibold text-blue-400 hover:text-blue-300 underline underline-offset-2">
+                        Apply for Co-op Membership →
+                    </a>
+                </div>
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
+                    <p class="text-sm text-amber-100 font-semibold leading-relaxed">
+                        ⚠ Co-op membership requires accountability, bonding, and adherence to collective rules. If you're looking for anonymous or low-commitment selling, this is not the right platform.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+            <div class="text-center">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-2">Member Login</h2>
+                <p class="text-sm text-gray-500">Access your Co-op Member (CM) account</p>
+            </div>
+            <!-- Session Expired Notice -->
+            <div id="sessionExpiredNotice" class="hidden mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-amber-600 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <div>
+                        <h4 class="text-sm font-semibold text-amber-800 mb-1">Session Expired</h4>
+                        <p class="text-sm text-amber-700">Your session has expired. Please log in again to continue.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <form id="vendorLoginForm" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <input id="loginUsername" type="text" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input id="loginPassword" type="password" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                </div>
+                <button type="submit"
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                    Log In
+                </button>
+                <p class="text-sm text-center text-gray-500">
+                    Don't have an account?
+                    <a href="#" id="gotoRegister" class="text-blue-600 hover:text-blue-700 font-medium">Apply for Co-op Membership</a>
+                </p>
+            </form>
+            <div id="loginMessage" class="hidden text-center text-sm"></div>
+        </div>
+    </div>
+
+    <script th:src="@{/vendor/logger.js}"></script>
+    <script th:src="@{/vendor/api-config.js}"></script>
+    <script>
+        // Check for session expired parameter
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('session_expired') === 'true') {
+                const notice = document.getElementById('sessionExpiredNotice');
+                if (notice) {
+                    notice.classList.remove('hidden');
+                }
+            }
+        });
+        
+        document.getElementById('gotoRegister').addEventListener('click', function (e) {
+            e.preventDefault();
+            window.location.href = '/mall/static/vendor/register';
+        });
+
+        document.getElementById('vendorLoginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            console.log('=== Vendor Login Form Submitted ===');
+            
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const messageEl = document.getElementById('loginMessage');
+            messageEl.classList.add('hidden');
+
+            console.log('Username:', username);
+            console.log('Password length:', password.length);
+
+            try {
+                const loginUrl = API.getURL('/api/mall/vendor/member/login');
+                const requestBody = new URLSearchParams({ username, password });
+                
+                console.log('Login URL:', loginUrl);
+                console.log('Request body:', requestBody.toString());
+                console.log('Sending login request...');
+                
+                const response = await fetch(loginUrl, {
+                    method: 'POST',
+                    headers: API.buildHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' }),
+                    credentials: 'include',
+                    body: requestBody
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+                
+                const result = await response.json();
+                console.log('Response body:', result);
+                
+                if (result.code === 200) {
+                    console.log('✅ Login successful!');
+                    console.log('Token:', result.data?.token || result.token);
+                    console.log('Username:', result.data?.username || result.username);
+                    console.log('Member ID:', result.data?.memberId || result.memberId);
+                    console.log('Has Application:', result.data?.hasApplication || result.hasApplication);
+                    
+                    messageEl.textContent = 'Login successful. Redirecting...';
+                    messageEl.className = 'text-center text-sm text-green-600';
+                    messageEl.classList.remove('hidden');
+                    
+                    setTimeout(() => {
+                        // Check if there's a saved redirect target (from application page)
+                        const redirectTarget = sessionStorage.getItem('vendorPortalRedirectTarget');
+                        console.log('Redirect target:', redirectTarget || 'default');
+                        
+                        if (redirectTarget) {
+                            // Clear the saved target
+                            sessionStorage.removeItem('vendorPortalRedirectTarget');
+                            // Redirect back to the saved page
+                            window.location.href = redirectTarget;
+                        } else {
+                            // Check if user has application records
+                            const hasApplication = result.data?.hasApplication || result.hasApplication || false;
+                            console.log('User has application:', hasApplication);
+                            
+                            if (!hasApplication) {
+                                // New user: redirect to application page
+                                console.log('New user detected, redirecting to application page');
+                                window.location.href = '/mall/static/vendor/application';
+                            } else {
+                                // Existing user: redirect to status page
+                                console.log('Existing user, redirecting to status page');
+                                window.location.href = '/mall/static/vendor/status';
+                            }
+                        }
+                    }, 800);
+                } else {
+                    console.error('❌ Login failed:', result.msg);
+                    messageEl.textContent = result.msg || 'Login failed. Please verify your username or password.';
+                    messageEl.className = 'text-center text-sm text-red-600';
+                    messageEl.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('❌ Vendor login exception:', error);
+                console.error('Error details:', {
+                    name: error.name,
+                    message: error.message,
+                    stack: error.stack
+                });
+                messageEl.textContent = 'Unable to log in right now. Please try again later. Check console for details.';
+                messageEl.className = 'text-center text-sm text-red-600';
+                messageEl.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
+

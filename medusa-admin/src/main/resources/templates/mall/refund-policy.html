@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refund & Reship Policy - THE PROFESSIONALS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #181818;
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: #111;
+            color: #fff;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 50px;
+            cursor: pointer;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .nav a:hover {
+            background: #222;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #fff;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: #999;
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+
+        /* Policy Section */
+        .policy-section {
+            background: #222;
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #4CAF50;
+            border-bottom: 2px solid #333;
+            padding-bottom: 0.5rem;
+        }
+
+        .subsection-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #81C784;
+        }
+
+        .policy-content p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .policy-content ul, .policy-content ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .policy-content li {
+            margin-bottom: 0.5rem;
+            line-height: 1.8;
+        }
+
+        .policy-content strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* PGP Key Section */
+        .pgp-section {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+
+        .pgp-key-block {
+            background: #0d0d0d;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            overflow-x: auto;
+        }
+
+        .pgp-key-block pre {
+            color: #4CAF50;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .copy-button {
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: all 0.2s;
+        }
+
+        .copy-button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .copy-button:active {
+            transform: translateY(0);
+        }
+
+        /* Notice Box */
+        .notice-box {
+            background: #2d3748;
+            border-left: 4px solid #4CAF50;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .notice-box strong {
+            color: #4CAF50;
+        }
+
+        /* Footer */
+        footer {
+            background: #222;
+            color: #fff;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .footer-logo img {
+            height: 60px;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .footer-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: #4CAF50;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+
+            .main-content {
+                padding: 0 1rem;
+                margin: 2rem auto;
+            }
+
+            .policy-section, .pgp-section {
+                padding: 1.5rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 2rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <img th:src="@{${logoUrl}}" alt="Logo" onclick="window.location.href='/mall/static/home'">
+            </div>
+            <div class="nav">
+                <a href="/mall/static/home">Home</a>
+                <a href="/mall/static/products">Products</a>
+                <a href="/mall/static/profile">Profile</a>
+                <a href="/mall/static/orders">Orders</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1 class="page-title">Refund & Reship Policy</h1>
+        <p class="page-subtitle">THE PROFESSIONALS - Terms and Conditions</p>
+
+        <!-- Policy Section -->
+        <div class="policy-section">
+            <h2 class="section-title">REFUND AND RESHIP POLICY</h2>
+            
+            <div class="notice-box">
+                <p><strong>By using our services, you agree to these terms and conditions. Please read them carefully before making any purchases.</strong></p>
+            </div>
+
+            <div class="policy-content">
+                <h3 class="subsection-title">1. Acknowledgement</h3>
+                <p>A client seeking refund / reship in relation to an order <strong>MUST</strong> read this section prior to contacting us. Upon raising a request of such kind the client is expected to have the following assumed knowledge:</p>
+                <ol type="a">
+                    <li>A tracking number that fails to retrieve information from tracking services, except for when it displays "invalid tracking number", does not mean the order is not sent.</li>
+                    <li>If the client raises a dispute in relation to an order, then the client forfeits the right to have the order investigated by us, and privileges mentioned in this section.</li>
+                    <li>Once a negative review is left by the client in relation to an order, then the order will not receive considerations mentioned in this section.</li>
+                    <li>A client has understood and agreed to matters mentioned herein prior to purchasing.</li>
+                </ol>
+
+                <h3 class="subsection-title">2. Refund / Reship Guidelines</h3>
+                <p>This guideline serves only as a reference, and does not serve as a guarantee. We reserve the final decision in all reship/refund matters. By purchasing from our store you agree to respect those decisions.</p>
+                <p>An order may only be considered for refund/ reship when it satisfies condition(s) described in section 2.2 and 2.4.</p>
+                <p>Reship and/or refund decisions are made on a case-by-case basis, with the following criteria as considerations:</p>
+                <ul>
+                    <li>Client's purchase history</li>
+                    <li>Client's credential</li>
+                    <li>Client's perceived integrity</li>
+                    <li>Client's future prospect with us</li>
+                    <li>Value of the order</li>
+                </ul>
+
+                <h3 class="subsection-title">2.2 Non-Arrival</h3>
+                <p>Except described in section 2.3, an order can be considered as a non-arrival if the tracking in which the order relates fails to cause a result from the server after 7 business days from the date in which the order was placed.</p>
+
+                <h3 class="subsection-title">2.3 Non-Arrival Exceptions</h3>
+                <p>The following tracking result does not constitute a "non-arrival":</p>
+                <ol type="a">
+                    <li>Delivery made to incorrect address (this will result in internal investigation to determine the causes, and decision made accordingly)</li>
+                    <li>Order is "returned to sender"</li>
+                    <li>If buyer chooses shipping options where tracking is not available and it fails to arrive</li>
+                </ol>
+
+                <h3 class="subsection-title">2.4 Non-Conformance</h3>
+                <p>Except described in section 2.5, an order can be considered as non-conformant if:</p>
+                <ol type="a">
+                    <li>The order is less than the amount mentioned in the listing</li>
+                    <li>The client receives the incorrect product</li>
+                    <li>The product cannot reasonably be considered satisfactory</li>
+                </ol>
+                <p><strong>Please note:</strong> Given the amount of scammers we get trying to tell us that their order is short when trying to get freebies, we almost will not proceed with a non-conformance investigation unless the client is well known to us or the order is substantial.</p>
+
+                <h3 class="subsection-title">2.5 Non-Conformance Exceptions</h3>
+                <p>The following are not instances of non-conformance:</p>
+                <ol type="a">
+                    <li>The product is damaged during transit</li>
+                    <li>The product does not resemble that of the display photo</li>
+                </ol>
+
+                <h3 class="subsection-title">2.6 Refund by Cancellation</h3>
+                <p>An order may be canceled under the following circumstances:</p>
+                <ol type="a">
+                    <li>The shipping address is outside of Australia</li>
+                    <li>The client is deemed unfit to make the purchase e.g. a person under the age of 18, a member of law enforcement, or is in risk of self harm or harming others. We are not liable to disclose our reasons for the cancellation</li>
+                    <li>Unforeseen circumstance</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- PGP Key Section -->
+        <div class="pgp-section">
+            <h2 class="section-title">PGP PUBLIC KEY</h2>
+            <p>Use this PGP public key to encrypt sensitive communications with us.</p>
+            
+            <div class="pgp-key-block">
+                <pre id="pgpKey">-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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
+kMktJZ90rNZcgGgpRGpCrw==
+
+=nC6z
+
+-----END PGP PUBLIC KEY BLOCK-----</pre>
+            </div>
+            
+            <button class="copy-button" onclick="copyPGPKey()">📋 Copy PGP Key</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img th:src="@{${footerLogo}}" alt="Footer Logo">
+            </div>
+            <div>
+                <ul class="footer-links">
+                    <li th:each="link : ${footerLinks}">
+                        <a th:href="${link.url}" th:text="${link.name}"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function copyPGPKey() {
+            const pgpKey = document.getElementById('pgpKey').textContent;
+            navigator.clipboard.writeText(pgpKey).then(() => {
+                const button = document.querySelector('.copy-button');
+                const originalText = button.textContent;
+                button.textContent = '✅ Copied!';
+                button.style.background = '#45a049';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#4CAF50';
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy: ' + err);
+            });
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.VendorInterviewSlotMapper">
+    
+    <resultMap type="VendorInterviewSlot" id="VendorInterviewSlotResult">
+        <result property="id"    column="id"    />
+        <result property="cmId"    column="cm_id"    />
+        <result property="slotStart"    column="slot_start"    />
+        <result property="slotEnd"    column="slot_end"    />
+        <result property="status"    column="status"    />
+        <result property="reservedInterviewId"    column="reserved_interview_id"    />
+        <result property="reservedVendorId"    column="reserved_vendor_id"    />
+        <result property="reservedVendorName"    column="reserved_vendor_name"    />
+        <result property="reservedApplicationId"    column="reserved_application_id"    />
+        <result property="reservedApplicationCode"    column="reserved_application_code"    />
+        <result property="reservedApplicationId"    column="reserved_application_id"    />
+        <result property="createTime"    column="created_at"    />
+        <result property="updateTime"    column="updated_at"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectSlotVo">
+        select s.id, s.cm_id, s.slot_start, s.slot_end, s.status, s.reserved_interview_id,
+               s.reserved_vendor_id,
+               coalesce(v.vendor_name, app.vendor_name) as reserved_vendor_name,
+               app.id as reserved_application_id,
+               app.application_id as reserved_application_code,
+               s.created_at, s.updated_at, s.create_by, s.update_by, s.remark
+        from mall_vendor_interview_slot s
+        left join mall_vendor v on s.reserved_vendor_id = v.id
+        left join mall_vendor_application app on s.reserved_vendor_id = app.id and app.del_flag = '0'
+    </sql>
+
+    <select id="selectSlotList" parameterType="VendorInterviewSlot" resultMap="VendorInterviewSlotResult">
+        <include refid="selectSlotVo"/>
+        <where>
+            <if test="cmId != null"> and s.cm_id = #{cmId}</if>
+            <if test="status != null and status != ''"> and s.status = #{status}</if>
+            <if test="slotStart != null"> and s.slot_start &gt;= #{slotStart}</if>
+            <if test="slotEnd != null"> and s.slot_end &lt;= #{slotEnd}</if>
+            <if test="reservedVendorId != null"> and s.reserved_vendor_id = #{reservedVendorId}</if>
+        </where>
+        order by s.slot_start asc
+    </select>
+
+    <select id="selectSlotById" parameterType="Long" resultMap="VendorInterviewSlotResult">
+        <include refid="selectSlotVo"/>
+        where s.id = #{id}
+    </select>
+
+    <select id="selectAvailableSlotsByCmAndDateRange" resultMap="VendorInterviewSlotResult">
+        <include refid="selectSlotVo"/>
+        where s.cm_id = #{cmId}
+          and s.status = 'available'
+          and DATE(s.slot_start) &gt;= DATE(#{startDate})
+          and DATE(s.slot_start) &lt;= DATE(#{endDate})
+        order by s.slot_start asc
+    </select>
+
+    <select id="selectAllAvailableSlots" resultMap="VendorInterviewSlotResult">
+        <include refid="selectSlotVo"/>
+        where s.status = 'available'
+          and DATE(s.slot_start) &gt;= DATE(#{startDate})
+          and DATE(s.slot_start) &lt;= DATE(#{endDate})
+        order by s.slot_start asc
+    </select>
+
+    <select id="selectSlotsByVendorId" resultMap="VendorInterviewSlotResult">
+        <include refid="selectSlotVo"/>
+        where s.reserved_vendor_id = #{vendorId}
+          and s.status in ('reserved', 'completed')
+        order by s.slot_start desc
+    </select>
+
+    <select id="selectSlotsByCmId" resultMap="VendorInterviewSlotResult">
+        <include refid="selectSlotVo"/>
+        where s.cm_id = #{cmId}
+        order by s.slot_start desc
+    </select>
+
+    <insert id="insertSlot" parameterType="VendorInterviewSlot" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_vendor_interview_slot
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cmId != null">cm_id,</if>
+            <if test="slotStart != null">slot_start,</if>
+            <if test="slotEnd != null">slot_end,</if>
+            <if test="status != null">status,</if>
+            <if test="reservedInterviewId != null">reserved_interview_id,</if>
+            <if test="reservedVendorId != null">reserved_vendor_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="cmId != null">#{cmId},</if>
+            <if test="slotStart != null">#{slotStart},</if>
+            <if test="slotEnd != null">#{slotEnd},</if>
+            <if test="status != null">#{status},</if>
+            <if test="reservedInterviewId != null">#{reservedInterviewId},</if>
+            <if test="reservedVendorId != null">#{reservedVendorId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <insert id="insertSlots" parameterType="java.util.List">
+        insert into mall_vendor_interview_slot (cm_id, slot_start, slot_end, status, create_by)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.cmId}, #{item.slotStart}, #{item.slotEnd}, #{item.status}, #{item.createBy})
+        </foreach>
+    </insert>
+
+    <update id="updateSlot" parameterType="VendorInterviewSlot">
+        update mall_vendor_interview_slot
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="cmId != null">cm_id = #{cmId},</if>
+            <if test="slotStart != null">slot_start = #{slotStart},</if>
+            <if test="slotEnd != null">slot_end = #{slotEnd},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="reservedInterviewId != null">reserved_interview_id = #{reservedInterviewId},</if>
+            <if test="reservedVendorId != null">reserved_vendor_id = #{reservedVendorId},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="reserveSlot">
+        update mall_vendor_interview_slot
+        set status = 'reserved',
+            reserved_interview_id = #{interviewId},
+            reserved_vendor_id = #{vendorId},
+            updated_at = now()
+        where id = #{slotId} and status = 'available'
+    </update>
+
+    <update id="releaseSlot">
+        update mall_vendor_interview_slot
+        set status = 'available',
+            reserved_interview_id = null,
+            reserved_vendor_id = null,
+            updated_at = now()
+        where id = #{slotId}
+    </update>
+
+    <delete id="deleteSlotById" parameterType="Long">
+        delete from mall_vendor_interview_slot where id = #{id}
+    </delete>
+
+    <delete id="deleteSlotByIds" parameterType="String">
+        delete from mall_vendor_interview_slot where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="checkSlotAvailable" resultType="int">
+        select count(1) from mall_vendor_interview_slot
+        where id = #{slotId} and status = 'available'
+    </select>
+
+</mapper>
+

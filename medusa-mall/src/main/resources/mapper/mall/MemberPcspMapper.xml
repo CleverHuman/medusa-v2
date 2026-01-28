@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.member.MemberPcspMapper">
+
+    <resultMap type="com.medusa.mall.domain.member.MemberPcsp" id="MemberPcspResult">
+        <id property="id" column="id" />
+        <result property="memberId" column="member_id" />
+        <result property="productId" column="product_id" />
+        <result property="orderSn" column="order_sn" />
+        <result property="packageType" column="package_type" />
+        <result property="startDate" column="start_date" />
+        <result property="expiryDate" column="expiry_date" />
+        <result property="status" column="status" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <sql id="selectPcspVo">
+        SELECT id, member_id, product_id, order_sn, package_type,
+               start_date, expiry_date, status,
+               create_by, create_time, update_by, update_time, remark
+        FROM mall_member_pcsp
+    </sql>
+
+    <select id="selectActivePcspByMemberId" parameterType="Long" resultMap="MemberPcspResult">
+        <include refid="selectPcspVo"/>
+        WHERE member_id = #{memberId}
+        AND status = 1
+        AND expiry_date > NOW()
+        ORDER BY expiry_date DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectPcspHistoryByMemberId" parameterType="Long" resultMap="MemberPcspResult">
+        <include refid="selectPcspVo"/>
+        WHERE member_id = #{memberId}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectPcspById" parameterType="Long" resultMap="MemberPcspResult">
+        <include refid="selectPcspVo"/>
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insertMemberPcsp" parameterType="com.medusa.mall.domain.member.MemberPcsp" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO mall_member_pcsp (
+            member_id,
+            product_id,
+            order_sn,
+            package_type,
+            start_date,
+            expiry_date,
+            status,
+            create_by,
+            create_time,
+            remark
+        ) VALUES (
+            #{memberId},
+            #{productId},
+            #{orderSn},
+            #{packageType},
+            #{startDate},
+            #{expiryDate},
+            #{status},
+            #{createBy},
+            NOW(),
+            #{remark}
+        )
+    </insert>
+
+    <update id="updateMemberPcsp" parameterType="com.medusa.mall.domain.member.MemberPcsp">
+        UPDATE mall_member_pcsp
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="expiryDate != null">expiry_date = #{expiryDate},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateExpiredPcspStatus">
+        UPDATE mall_member_pcsp
+        SET status = 0,
+            update_time = NOW()
+        WHERE status = 1
+        AND expiry_date &lt; NOW()
+    </update>
+
+    <delete id="deletePcspById" parameterType="Long">
+        DELETE FROM mall_member_pcsp WHERE id = #{id}
+    </delete>
+
+</mapper>
+
+
+

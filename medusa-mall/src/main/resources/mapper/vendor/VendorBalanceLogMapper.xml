@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.VendorBalanceLogMapper">
+    
+    <resultMap type="com.medusa.mall.domain.vendor.VendorBalanceLog" id="VendorBalanceLogResult">
+        <id     property="id"       column="id"      />
+        <result property="vendorId" column="vendor_id" />
+        <result property="changeType" column="change_type" />
+        <result property="amount" column="amount" />
+        <result property="beforeBalance" column="before_balance" />
+        <result property="afterBalance" column="after_balance" />
+        <result property="relatedOrderId" column="related_order_id" />
+        <result property="relatedWithdrawalId" column="related_withdrawal_id" />
+        <result property="availableDate" column="available_date" />
+        <result property="description" column="description" />
+        <result property="createTime" column="create_time" />
+    </resultMap>
+
+    <sql id="selectVendorBalanceLogVo">
+        select id, vendor_id, change_type, amount, before_balance, after_balance,
+               related_order_id, related_withdrawal_id, available_date, description, create_time
+        from mall_vendor_balance_log
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="VendorBalanceLogResult">
+        <include refid="selectVendorBalanceLogVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectByVendorId" parameterType="Long" resultMap="VendorBalanceLogResult">
+        <include refid="selectVendorBalanceLogVo"/>
+        where vendor_id = #{vendorId}
+        order by create_time desc
+    </select>
+
+    <select id="selectList" parameterType="com.medusa.mall.domain.vendor.VendorBalanceLog" resultMap="VendorBalanceLogResult">
+        <include refid="selectVendorBalanceLogVo"/>
+        <where>
+            <if test="vendorId != null">
+                and vendor_id = #{vendorId}
+            </if>
+            <if test="changeType != null and changeType != ''">
+                and change_type = #{changeType}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.medusa.mall.domain.vendor.VendorBalanceLog" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_vendor_balance_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="vendorId != null">vendor_id,</if>
+            <if test="changeType != null and changeType != ''">change_type,</if>
+            <if test="amount != null">amount,</if>
+            <if test="beforeBalance != null">before_balance,</if>
+            <if test="afterBalance != null">after_balance,</if>
+            <if test="relatedOrderId != null">related_order_id,</if>
+            <if test="relatedWithdrawalId != null">related_withdrawal_id,</if>
+            <if test="availableDate != null">available_date,</if>
+            <if test="description != null">description,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="vendorId != null">#{vendorId},</if>
+            <if test="changeType != null and changeType != ''">#{changeType},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="beforeBalance != null">#{beforeBalance},</if>
+            <if test="afterBalance != null">#{afterBalance},</if>
+            <if test="relatedOrderId != null">#{relatedOrderId},</if>
+            <if test="relatedWithdrawalId != null">#{relatedWithdrawalId},</if>
+            <if test="availableDate != null">#{availableDate},</if>
+            <if test="description != null">#{description},</if>
+            NOW()
+        </trim>
+    </insert>
+
+</mapper>
+

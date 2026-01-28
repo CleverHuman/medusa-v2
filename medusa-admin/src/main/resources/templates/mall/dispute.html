@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Dispute - Mall</title>
+    <style>
+        body {
+            background: #181818;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background: #111;
+            color: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+        .nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .nav a:hover {
+            background: #222;
+        }
+        .main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            color: #fff;
+        }
+        .dispute-container {
+            background: #222;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            overflow: hidden;
+            color: #fff;
+        }
+        .dispute-header {
+            background: #181818;
+            padding: 1.5rem;
+            border-bottom: 1px solid #333;
+        }
+        .dispute-header h2 {
+            margin: 0;
+            color: #fff;
+        }
+        .dispute-content {
+            padding: 2rem;
+        }
+        .order-info {
+            background: #181818;
+            border: 1px solid #333;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            text-align: left;
+            color: #fff;
+        }
+        .order-info h3 {
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #333;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 500;
+            color: #bbb;
+        }
+        .info-value {
+            color: #fff;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #fff;
+            font-weight: 500;
+        }
+        .form-group textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 0.75rem;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background: #181818;
+            color: #fff;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ff9800;
+        }
+        .dispute-actions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            background: #181818;
+            border-top: 1px solid #333;
+            text-align: center;
+            width: 100%;
+        }
+        .dispute-actions .btn {
+            margin: 0 0.5rem;
+            min-width: 120px;
+            flex-shrink: 0;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: background-color 0.2s;
+            font-weight: 500;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .btn-danger {
+            background: #ff5722;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #d84315;
+        }
+        .error-message {
+            background: #ff5722;
+            color: #fff;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        .success-message {
+            background: #4caf50;
+            color: #fff;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .nav {
+                gap: 1rem;
+            }
+            .dispute-actions {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .info-row {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <!-- LOGO -->
+        <div class="logo">
+            <img th:src="@{${logoUrl}}" alt="LOGO" style="height:60px;">
+        </div>
+        <nav class="nav">
+            <a th:href="@{/mall/static/home}">HOME</a>
+            <a th:href="@{/mall/static/digital-products}">DIGITAL PRODUCT</a>
+            <a th:href="@{/mall/static/physical-products}">PHYSICAL PRODUCT</a>
+            <a th:href="@{/mall/static/orders}">ORDERS</a>
+            <a th:href="@{/mall/static/cart}">CART</a>
+            <a th:href="@{/mall/static/profile}">PROFILE</a>
+            <a th:if="${session.memberToken == null}" th:href="@{/mall/static/login}">LOGIN</a>
+            <a th:if="${session.memberToken != null}" th:href="@{/mall/static/logout}">LOGOUT</a>
+        </nav>
+    </header>
+    <main class="main">
+        <h1 th:if="${order.isdispute != 1}">Submit Dispute</h1>
+        <h1 th:if="${order.isdispute == 1}">Dispute Details</h1>
+        
+        <div th:if="${error}" class="error-message" th:text="${error}">Error message</div>
+        <div th:if="${message}" class="success-message" th:text="${message}">Success message</div>
+        
+        <div class="dispute-container">
+            <div class="dispute-header">
+                <h2 th:if="${order.isdispute != 1}">Order Dispute</h2>
+                <h2 th:if="${order.isdispute == 1}">Dispute Information</h2>
+            </div>
+            <div class="dispute-content">
+                <div class="order-info">
+                    <h3>Order Information</h3>
+                    <div class="info-row">
+                        <span class="info-label">Order #:</span>
+                        <span class="info-value" th:text="${order.orderSn}">12345</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Date:</span>
+                        <span class="info-value" th:text="${#dates.format(order.createTime, 'dd-MM-yyyy')}">15-01-2025</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Total Amount:</span>
+                        <span class="info-value" th:text="'$' + ${order.totalAmount}">$137.00</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value" th:text="${order.status}">Pending</span>
+                    </div>
+                    <div class="info-row" th:if="${order.isdispute == 1}">
+                        <span class="info-label">Dispute Status:</span>
+                        <span class="info-value" style="color: #ff5722;">Disputed</span>
+                    </div>
+                    <div class="info-row" th:if="${order.disputeTime != null}">
+                        <span class="info-label">Dispute Time:</span>
+                        <span class="info-value" th:text="${#dates.format(order.disputeTime, 'dd-MM-yyyy HH:mm')}">15-01-2025 10:30</span>
+                    </div>
+                </div>
+                
+                <!-- 如果订单已经有争议，显示争议信息 -->
+                <div th:if="${order.isdispute == 1}" class="order-info">
+                    <h3>Dispute Information</h3>
+                    <div class="info-row" th:if="${order.disputeReason != null and order.disputeReason != ''}">
+                        <span class="info-label">Dispute Reason:</span>
+                        <span class="info-value" th:text="${order.disputeReason}">Dispute reason</span>
+                    </div>
+                    <div class="info-row" th:if="${order.disputeBy != null and order.disputeBy != ''}">
+                        <span class="info-label">Disputed By:</span>
+                        <span class="info-value" th:text="${order.disputeBy}">User ID</span>
+                    </div>
+                </div>
+                
+                <!-- 如果订单还没有争议，显示争议表单 -->
+                <form th:if="${order.isdispute != 1}" th:action="@{/mall/static/orders/dispute}" method="post">
+                    <input type="hidden" name="orderId" th:value="${orderId}" />
+                    
+                    <div class="form-group">
+                        <label for="reason">Dispute Reason (Optional):</label>
+                        <textarea id="reason" name="reason" placeholder="Please describe the reason for your dispute..."></textarea>
+                    </div>
+                    
+                    <div class="dispute-actions">
+                        <button type="submit" class="btn btn-danger">Submit Dispute</button>
+                        <a th:href="@{/mall/static/orders}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+                
+                <!-- 如果订单已经有争议，只显示返回按钮 -->
+                <div th:if="${order.isdispute == 1}" class="dispute-actions">
+                    <a th:href="@{/mall/static/orders}" class="btn btn-secondary">Back to Orders</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer style="background:#222;color:#fff;padding:2rem 0;margin-top:2rem;">
+        <div style="max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+                <img th:src="@{${footerLogo}}" alt="Footer Logo" style="height:60px;">
+            </div>
+            <div>
+                <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                    <li th:each="link : ${footerLinks}">
+                        <a th:href="${link.url}" th:text="${link.name}" style="color:#fff;text-decoration:none;font-size:14px;line-height:1.5;"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 

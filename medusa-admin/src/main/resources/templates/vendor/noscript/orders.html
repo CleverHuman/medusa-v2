@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders - Co-op Member Portal</title>
+    <link href="/css/noscript-vendor.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-gray-900">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md fixed w-full top-0 z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-amber-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">V</span>
+                    </div>
+                    <span class="text-xl font-bold text-gray-900">Co-op Member Portal</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/mall/static/vendor/status" class="text-gray-600 hover:text-blue-600 transition-colors">Dashboard</a>
+                    <a href="/mall/static/vendor/application" class="text-gray-600 hover:text-blue-600 transition-colors">Application</a>
+                    <a href="/mall/static/vendor/products" class="text-gray-600 hover:text-blue-600 transition-colors">Products</a>
+                    <a href="/mall/static/vendor/orders" class="text-blue-600 font-semibold">Orders</a>
+                    <a href="/mall/static/vendor/bond-level" class="text-gray-600 hover:text-blue-600 transition-colors">Bond & Level</a>
+                    <a href="/mall/static/vendor/withdrawal" class="text-gray-600 hover:text-blue-600 transition-colors">Withdrawal</a>
+                    <div th:if="${isLoggedIn}" class="flex items-center space-x-3 border-l border-gray-300 pl-4 ml-4">
+                        <span class="text-sm text-gray-600">Logged in as:</span>
+                        <span class="text-sm font-semibold text-gray-900" th:text="${currentUsername}">username</span>
+                        <form method="post" th:action="@{/mall/static/vendor/logout}" class="inline">
+                            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold text-sm">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-20 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">My Orders</h1>
+                <p class="text-gray-600 mt-2">View and manage your orders</p>
+            </div>
+
+            <!-- Error Message -->
+            <div th:if="${error}" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded">
+                <p class="text-sm text-red-700" th:text="${error}">Error message</p>
+            </div>
+
+            <!-- Filter Form -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <form method="get" action="/mall/static/vendor/orders" class="flex items-end space-x-4">
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Filter by Status</label>
+                        <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                            <option value="">All Orders</option>
+                            <option value="0" th:selected="${statusFilter == '0'}">Pending</option>
+                            <option value="1" th:selected="${statusFilter == '1'}">Paid</option>
+                            <option value="2" th:selected="${statusFilter == '2'}">Shipped</option>
+                            <option value="3" th:selected="${statusFilter == '3'}">Completed</option>
+                            <option value="4" th:selected="${statusFilter == '4'}">Cancelled</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                        Filter
+                    </button>
+                    <a href="/mall/static/vendor/orders" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
+                        Clear
+                    </a>
+                </form>
+            </div>
+
+            <!-- Orders List -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <!-- Pagination Info -->
+                <div class="mb-4 flex justify-between items-center">
+                    <p class="text-sm text-gray-600">
+                        Showing page <span th:text="${currentPage}"></span> of <span th:text="${totalPages}"></span>
+                        (<span th:text="${total}"></span> total orders)
+                    </p>
+                </div>
+
+                <!-- Orders Table -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Number</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Date</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr th:each="order : ${orders}">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900" th:text="${order.orderSn}">Order Number</div>
+                                    <div class="text-sm text-gray-500" th:text="${order.id}">Order ID</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="text-sm font-medium text-gray-900">
+                                        $<span th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 2, 'POINT')}"></span> AUD
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                          th:classappend="${order.status == 0} ? 'bg-yellow-100 text-yellow-800' : 
+                                                          (${order.status == 1} ? 'bg-blue-100 text-blue-800' :
+                                                          (${order.status == 2} ? 'bg-purple-100 text-purple-800' :
+                                                          (${order.status == 3} ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')))"
+                                          th:text="${order.status == 0} ? 'Pending' : 
+                                                     (${order.status == 1} ? 'Paid' :
+                                                     (${order.status == 2} ? 'Shipped' :
+                                                     (${order.status == 3} ? 'Completed' : 'Cancelled')))">Status</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                    th:if="${order.createTime != null}"
+                                    th:text="${#temporals.format(order.createTime, 'yyyy-MM-dd HH:mm:ss')}">Date</td>
+                            </tr>
+                            <tr th:if="${orders == null or orders.isEmpty()}">
+                                <td colspan="4" class="px-6 py-4 text-center text-gray-500">No orders found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="mt-6 flex items-center justify-between" th:if="${totalPages > 1}">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        <a th:if="${hasPrev}" 
+                           th:href="@{/mall/static/vendor/orders(page=${currentPage - 1}, status=${statusFilter})}"
+                           class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Previous
+                        </a>
+                        <a th:if="${hasNext}"
+                           th:href="@{/mall/static/vendor/orders(page=${currentPage + 1}, status=${statusFilter})}"
+                           class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Next
+                        </a>
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                Page <span th:text="${currentPage}"></span> of <span th:text="${totalPages}"></span>
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                <a th:if="${hasPrev}"
+                                   th:href="@{/mall/static/vendor/orders(page=${currentPage - 1}, status=${statusFilter})}"
+                                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    Previous
+                                </a>
+                                <a th:if="${hasNext}"
+                                   th:href="@{/mall/static/vendor/orders(page=${currentPage + 1}, status=${statusFilter})}"
+                                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    Next
+                                </a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

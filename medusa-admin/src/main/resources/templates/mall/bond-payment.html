@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bond Payment - Co-op Member</title>
+    <style>
+        body {
+            background: #181818;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: #222;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            min-height: 600px;
+            color: #fff;
+            margin: 20px;
+        }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        .sidebar {
+            width: 300px;
+            background: #181818;
+            padding: 40px 30px;
+            border-left: 1px solid #333;
+            color: #fff;
+        }
+        .page-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .page-subtitle {
+            color: #bbb;
+            margin-bottom: 30px;
+        }
+        .payment-methods {
+            margin-bottom: 2rem;
+        }
+        .payment-method {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
+            border: 2px solid #333;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #222;
+            color: #fff;
+        }
+        .payment-method:hover {
+            border-color: #ff9800;
+            background: #2a2a2a;
+        }
+        .payment-radio {
+            margin-right: 1rem;
+            transform: scale(1.2);
+            display: block !important;
+        }
+        .payment-method:has(.payment-radio:checked) {
+            border-color: #ff9800;
+            background: #2a2a2a;
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.3);
+        }
+        .payment-radio:checked + .payment-info {
+            color: #ff9800;
+        }
+        .payment-radio:checked ~ .payment-icon {
+            color: #ff9800;
+        }
+        .payment-info {
+            flex: 1;
+        }
+        .payment-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+        .payment-description {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        .payment-icon {
+            font-size: 1.5rem;
+            margin-left: 1rem;
+            color: #ff9800;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #ff9800;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+        .submit-btn:hover:not(:disabled) {
+            background: #ff8800;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+        }
+        .submit-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        .order-summary {
+            background: #222;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .order-summary h3 {
+            margin-top: 0;
+            color: #fff;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #333;
+        }
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #ff9800;
+            color: #ff9800;
+        }
+        .error-message {
+            background: #d32f2f;
+            color: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <h1 class="page-title">Payment Method</h1>
+            <p class="page-subtitle">Choose your preferred payment method</p>
+            
+            <div th:if="${error}" class="error-message" th:text="${error}"></div>
+            
+            <!-- Order Summary -->
+            <div class="order-summary">
+                <h3>Order Summary</h3>
+                <div class="order-item">
+                    <span>Order ID:</span>
+                    <span th:text="${orderId}">0385156</span>
+                </div>
+                <div th:each="item : ${orderItems}" class="order-item">
+                    <span th:text="${item.productName}">Co-op Member Bond Payment</span>
+                    <span th:text="'$' + ${#numbers.formatDecimal(item.totalPrice, 1, 2)}">$3,000.00</span>
+                </div>
+                <div class="order-total">
+                    <span>Total Amount:</span>
+                    <span th:text="'$' + ${#numbers.formatDecimal(totalAmount, 1, 2)}">$3,000.00</span>
+                </div>
+            </div>
+            
+            <!-- Payment Methods -->
+            <form id="paymentForm" action="/mall/static/vendor/bond/payment/confirm" method="post">
+                <div class="payment-methods">
+                    <label class="payment-method" for="btc">
+                        <input type="radio" name="paymentMethod" value="0" id="btc" class="payment-radio" required>
+                        <div class="payment-info">
+                            <div class="payment-name">Bitcoin (BTC)</div>
+                            <div class="payment-description">Pay with Bitcoin cryptocurrency</div>
+                        </div>
+                        <div class="payment-icon">₿</div>
+                    </label>
+
+                    <label class="payment-method" for="usdt">
+                        <input type="radio" name="paymentMethod" value="usdt" id="usdt" class="payment-radio">
+                        <div class="payment-info">
+                            <div class="payment-name">Tether (TRC20)</div>
+                            <div class="payment-description">Pay with USDT on TRON network</div>
+                        </div>
+                        <div class="payment-icon">₮</div>
+                    </label>
+
+                    <label class="payment-method" for="xmr">
+                        <input type="radio" name="paymentMethod" value="xmr" id="xmr" class="payment-radio">
+                        <div class="payment-info">
+                            <div class="payment-name">Monero (XMR)</div>
+                            <div class="payment-description">Pay with Monero cryptocurrency</div>
+                        </div>
+                        <div class="payment-icon">ɱ</div>
+                    </label>
+                </div>
+
+                <!-- Pass application info for order creation -->
+                <input type="hidden" name="level" th:value="${level}">
+                <input type="hidden" name="applicationId" th:value="${applicationId}">
+                <input type="hidden" name="applicationNumber" th:value="${applicationNumber}">
+                <button type="submit" class="submit-btn" id="submitBtn">Submit</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

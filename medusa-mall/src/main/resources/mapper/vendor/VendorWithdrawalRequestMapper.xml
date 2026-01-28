@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.VendorWithdrawalRequestMapper">
+    
+    <resultMap type="com.medusa.mall.domain.vendor.VendorWithdrawalRequest" id="VendorWithdrawalRequestResult">
+        <id     property="id"       column="id"      />
+        <result property="requestCode" column="request_code" />
+        <result property="vendorId" column="vendor_id" />
+        <result property="currency" column="currency" />
+        <result property="amount" column="amount" />
+        <result property="withdrawalAddress" column="withdrawal_address" />
+        <result property="requestStatus" column="request_status" />
+        <result property="requestTime" column="request_time" />
+        <result property="approveBy" column="approve_by" />
+        <result property="approveTime" column="approve_time" />
+        <result property="approveRemark" column="approve_remark" />
+        <result property="txHash" column="tx_hash" />
+        <result property="txTime" column="tx_time" />
+        <result property="txFee" column="tx_fee" />
+        <result property="rejectReason" column="reject_reason" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <sql id="selectVendorWithdrawalRequestVo">
+        select id, request_code, vendor_id, currency, amount, withdrawal_address,
+               request_status, request_time, approve_by, approve_time, approve_remark,
+               tx_hash, tx_time, tx_fee, reject_reason,
+               create_by, create_time, update_by, update_time, remark
+        from mall_vendor_withdrawal_request
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="VendorWithdrawalRequestResult">
+        <include refid="selectVendorWithdrawalRequestVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectByRequestCode" parameterType="String" resultMap="VendorWithdrawalRequestResult">
+        <include refid="selectVendorWithdrawalRequestVo"/>
+        where request_code = #{requestCode}
+    </select>
+
+    <select id="selectByVendorId" parameterType="Long" resultMap="VendorWithdrawalRequestResult">
+        <include refid="selectVendorWithdrawalRequestVo"/>
+        where vendor_id = #{vendorId}
+        order by request_time desc
+    </select>
+
+    <select id="selectList" parameterType="com.medusa.mall.domain.vendor.VendorWithdrawalRequest" resultMap="VendorWithdrawalRequestResult">
+        <include refid="selectVendorWithdrawalRequestVo"/>
+        <where>
+            <if test="vendorId != null">
+                and vendor_id = #{vendorId}
+            </if>
+            <if test="currency != null and currency != ''">
+                and currency = #{currency}
+            </if>
+            <if test="requestStatus != null and requestStatus != ''">
+                and request_status = #{requestStatus}
+            </if>
+        </where>
+        order by request_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.medusa.mall.domain.vendor.VendorWithdrawalRequest" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_vendor_withdrawal_request
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="requestCode != null and requestCode != ''">request_code,</if>
+            <if test="vendorId != null">vendor_id,</if>
+            <if test="currency != null and currency != ''">currency,</if>
+            <if test="amount != null">amount,</if>
+            <if test="withdrawalAddress != null and withdrawalAddress != ''">withdrawal_address,</if>
+            <if test="requestStatus != null and requestStatus != ''">request_status,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null">remark,</if>
+            request_time, create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="requestCode != null and requestCode != ''">#{requestCode},</if>
+            <if test="vendorId != null">#{vendorId},</if>
+            <if test="currency != null and currency != ''">#{currency},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="withdrawalAddress != null and withdrawalAddress != ''">#{withdrawalAddress},</if>
+            <if test="requestStatus != null and requestStatus != ''">#{requestStatus},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            NOW(), NOW()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.medusa.mall.domain.vendor.VendorWithdrawalRequest">
+        update mall_vendor_withdrawal_request
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="requestStatus != null and requestStatus != ''">request_status = #{requestStatus},</if>
+            <if test="approveBy != null and approveBy != ''">approve_by = #{approveBy},</if>
+            <if test="approveTime != null">approve_time = #{approveTime},</if>
+            <if test="approveRemark != null">approve_remark = #{approveRemark},</if>
+            <if test="txHash != null">tx_hash = #{txHash},</if>
+            <if test="txTime != null">tx_time = #{txTime},</if>
+            <if test="txFee != null">tx_fee = #{txFee},</if>
+            <if test="rejectReason != null">reject_reason = #{rejectReason},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = NOW()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        update mall_vendor_withdrawal_request
+        set request_status = #{status},
+            update_time = NOW()
+        where id = #{id}
+    </update>
+
+</mapper>
+

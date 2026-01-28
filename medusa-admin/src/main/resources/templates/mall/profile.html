@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+      <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Mall</title>
+    <!-- Noscript重定向机制 -->
+    <meta th:if="${redirectToLogin}" http-equiv="refresh" content="0;url=/mall/static/login" />
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <style>
+    body {
+      background: #181818;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      background: #111;
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+    .nav {
+      display: flex;
+      gap: 2rem;
+    }
+    .nav a {
+      color: #fff;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+    .nav a:hover {
+      background: #222;
+    }
+    .profile-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 20px 40px 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .welcome-title {
+      font-size: 3rem;
+      font-weight: 600;
+      margin-bottom: 48px;
+      text-align: center;
+      letter-spacing: 1px;
+      width: 100%;
+    }
+    .info-card {
+      background: #232323;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      padding: 0;
+      margin-bottom: 48px;
+      overflow: hidden;
+      width: 100%;
+      max-width: 1000px;
+    }
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .info-table tr {
+      border-bottom: 1px solid #333;
+      height: 56px;
+    }
+    .info-table tr:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      font-size: 1.1rem;
+      font-weight: 500;
+      padding-left: 32px;
+      color: #bdbdbd;
+      text-align: left;
+      width: 40%;
+    }
+    .info-value {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: #fff;
+      text-align: right;
+      padding-right: 32px;
+      width: 60%;
+    }
+    .section-title {
+      font-size: 2rem;
+      font-weight: 600;
+      margin: 40px 0 32px 0;
+      text-align: center;
+      letter-spacing: 1px;
+      width: 100%;
+    }
+    .level-container {
+      display: flex;
+      flex-direction: row;
+      gap: 32px;
+      margin-bottom: 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .level-item {
+      background: #232323;
+      border-radius: 12px;
+      overflow: hidden;
+      min-width: 180px;
+      flex: 1 1 180px;
+      max-width: 220px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      margin-bottom: 0;
+    }
+    .level-header {
+      padding: 18px 0;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      color: #000;
+    }
+    .level-content {
+      padding: 24px 0 20px 0;
+      background: #232323;
+      text-align: center;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+    .level-points {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    .level-desc {
+      font-size: 0.98rem;
+      color: #bdbdbd;
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+    .level-item[th\:style], .level-content[th\:style] {
+      transition: background 0.3s, color 0.3s;
+    }
+    /* 当前等级高亮 */
+    .level-content.active {
+      font-weight: bold;
+      box-shadow: 0 0 0 2px #fff2, 0 2px 8px rgba(0,0,0,0.10);
+    }
+    /* 响应式 */
+    @media (max-width: 1200px) {
+      .profile-main {
+        padding: 30px 20px 20px 20px;
+      }
+      .level-container {
+        gap: 18px;
+      }
+    }
+    @media (max-width: 900px) {
+      .header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+      }
+      .nav {
+        gap: 1rem;
+      }
+      .level-container {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .level-item {
+        min-width: 140px;
+        max-width: 48%;
+      }
+    }
+    @media (max-width: 600px) {
+      .profile-main {
+        padding: 10px 20px 10px 20px;
+      }
+      .welcome-title {
+        font-size: 2rem;
+      }
+      .section-title {
+        font-size: 1.2rem;
+      }
+      .level-item {
+        min-width: 100px;
+        max-width: 100%;
+      }
+      .info-label, .info-value {
+        font-size: 1rem;
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+    }
+    .agreement-section {
+      background: #232323;
+      border-radius: 12px;
+      padding: 32px;
+      margin-top: 40px;
+      max-width: 1000px;
+      width: 100%;
+    }
+    .agreement-title {
+      font-size: 1.3em;
+      color: #d4af37;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+    .agreement-content {
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 15px;
+    }
+    .question {
+      font-size: 1.1em;
+      color: #ffffff;
+      margin: 15px 0 8px;
+      font-weight: bold;
+    }
+    .answer {
+      font-size: 0.95em;
+      color: #cccccc;
+      line-height: 1.7;
+      margin-bottom: 20px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      padding-left: 15px;
+      border-left: 2px solid #444;
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1a1a1a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+    <header class="header">
+        <!-- LOGO -->
+        <div class="logo">
+            <img th:src="@{${logoUrl}}" alt="LOGO" style="height:60px;">
+        </div>
+            <nav class="nav">
+                <a th:href="@{/mall/static/home}">HOME</a>
+                <a th:href="@{/mall/static/digital-products}">DIGITAL PRODUCT</a>
+                <a th:href="@{/mall/static/physical-products}">PHYSICAL PRODUCT</a>
+                <a th:href="@{/mall/static/orders}">ORDERS</a>
+                <a th:href="@{/mall/static/cart}">CART</a>
+                <a th:href="@{/mall/static/profile}">PROFILE</a>
+                <a th:if="${session.memberToken == null}" th:href="@{/mall/static/login}">LOGIN</a>
+                <a th:if="${session.memberToken != null}" th:href="@{/mall/static/logout}">LOGOUT</a>
+            </nav>
+    </header>
+  <div class="profile-main">
+    <div class="welcome-title">Welcome, <span th:text="${profile.username}">Username</span></div>
+    <div class="info-card">
+      <table class="info-table">
+        <tr>
+          <td class="info-label">Username</td>
+          <td class="info-value" th:text="${profile.username}">Username</td>
+        </tr>
+        <tr>
+          <td class="info-label">Current Point</td>
+          <td class="info-value" th:text="${profile.currentPoint}">0</td>
+        </tr>
+        <tr>
+          <td class="info-label">Current Level</td>
+          <td class="info-value" th:text="${profile.currentLevel}">Bronze</td>
+        </tr>
+      </table>
+    </div>
+    <div class="section-title">Loyalty Point</div>
+    <div class="level-container">
+      <div class="level-item" th:each="level : ${levels}">
+        <div class="level-header" th:text="${level.name}" th:style="'background-color:' + ${level.color}"></div>
+        <div class="level-content" th:classappend="${profile.currentLevel} == ${level.name} ? 'active' : ''" th:style="'background-color:' + (${profile.currentLevel} == ${level.name} ? level.color : '#232323') + ';color:' + (${profile.currentLevel} == ${level.name} ? level.textColor : '#fff')">
+          <div class="level-points" th:text="${level.points} + ' Points'">0 Points</div>
+          <div class="level-desc" th:text="${level.desc}">Description</div>
+        </div>
+      </div>
+    </div>
+    <div class="agreement-section">
+      <div class="agreement-title">User Agreement</div>
+      <div class="agreement-content">
+        <div th:each="paragraph : ${agreementParagraphs}">
+          <h4 th:if="${paragraph.isQuestion}" class="question" th:text="${paragraph.text}"></h4>
+          <p th:if="${!paragraph.isQuestion}" class="answer" th:text="${paragraph.text}"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer style="background:#222;color:#fff;padding:2rem 0;margin-top:2rem;">
+      <div style="max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+                              <img th:src="@{${footerLogo}}" alt="Footer Logo" style="height:60px;">
+          </div>
+          <div>
+              <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                  <li th:each="link : ${footerLinks}">
+                      <a th:href="${link.url}" th:text="${link.name}" style="color:#fff;text-decoration:none;font-size:14px;line-height:1.5;"></a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </footer>
+</body>
+</html> 

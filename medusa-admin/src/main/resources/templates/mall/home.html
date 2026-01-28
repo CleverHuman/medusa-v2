@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mall - Home</title>
+    <!-- Noscript重定向机制 -->
+    <meta th:if="${redirectToLogin}" http-equiv="refresh" content="0;url=/mall/static/login" />
+    <style>
+        body {
+            background: #181818;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background: #111;
+            color: #fff;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+        .nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .nav a:hover {
+            background: #222;
+        }
+        .nav a.disabled {
+            color: #666;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .nav a.disabled:hover {
+            background: transparent;
+        }
+        .main {
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 1rem 2rem 1rem;
+        }
+        .welcome-title {
+            font-size: 2.8rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+            color: #fff;
+            text-align: center;
+        }
+        .desc {
+            font-size: 1.2rem;
+            color: #bbb;
+            text-align: center;
+            max-width: 600px;
+            margin-bottom: 2rem;
+        }
+        @media (max-width: 600px) {
+            .header { flex-direction: column; gap: 1rem; padding: 1rem; }
+            .main { padding: 2rem 0.5rem; }
+            .welcome-title { font-size: 2rem; }
+        }
+        .home-images { width: 100%; margin-top: 2rem; }
+        .top-image { width: 100%; display: flex; justify-content: center; }
+        .bottom-images { margin-top: 1.5rem; }
+        
+        /* Banner 样式 - 扩展到浏览器宽度 */
+        .banner {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .banner-container {
+            position: relative;
+            width: 100%;
+            min-height: 400px;
+            max-height: 600px;
+        }
+        
+        .banner-slides {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .banner-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+        
+        .banner-slide.single {
+            opacity: 1;
+            animation: none;
+            position: relative;
+        }
+        
+        .banner-slide.multiple {
+            animation: bannerFade 12s infinite;
+        }
+        
+        @keyframes bannerFade {
+            0%, 25%, 100% { opacity: 0; }
+            8.33%, 16.67% { opacity: 1; }
+        }
+        
+        .banner-image {
+            width: 100%;
+            height: auto;
+            max-height: 600px;
+            object-fit: contain;
+            display: block;
+        }
+        
+        .banner-link {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        
+        .banner-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+        
+        .banner-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            animation: dotPulse 12s infinite;
+        }
+        
+        @keyframes dotPulse {
+            0%, 25%, 100% { background: rgba(255, 255, 255, 0.5); transform: scale(1); }
+            8.33%, 16.67% { background: rgba(255, 255, 255, 1); transform: scale(1.2); }
+        }
+        
+        @media (max-width: 1200px) {
+            .bottom-images { 
+                flex-direction: column; 
+                align-items: center; 
+                gap: 1rem; 
+                width: 100%;
+            }
+            .product-section {
+                width: 100% !important;
+                max-width: 600px;
+            }
+        }
+        
+        .product-section {
+            min-height: 300px;
+            background: #2d2d2d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .product-section img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .product-label {
+            background: rgba(0,0,0,0.8) !important;
+        }
+        
+        .product-label h3 {
+            font-size: 1.5rem !important;
+            font-weight: bold !important;
+            margin: 0 !important;
+            color: #fff !important;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <!-- LOGO -->
+        <div class="logo">
+            <img th:src="@{${logoUrl}}" alt="LOGO" style="height:60px;">
+        </div>
+        <nav class="nav">
+            <a th:href="@{/mall/static/digital-products}">DIGITAL PRODUCT</a>
+            <a th:href="@{/mall/static/physical-products}">PHYSICAL PRODUCT</a>
+            <a th:href="@{/mall/static/orders}">ORDERS</a>
+            <a th:href="@{/mall/static/cart}">CART</a>
+            <a th:href="@{/mall/static/profile}">PROFILE</a>
+            <a th:if="${session.memberToken != null}" th:href="@{/mall/static/vendor/application}" target="_blank">VENDOR APPLY</a>
+            <a th:href="@{/mall/static/vendor/login}" target="_blank">Become a co-op member</a>
+            <!-- 未登录用户显示登录链接，已登录用户显示登出链接 -->
+            <a th:if="${session.memberToken == null}" th:href="@{/mall/static/login}">LOGIN</a>
+            <a th:if="${session.memberToken != null}" th:href="@{/mall/static/logout}">LOGOUT</a>
+        </nav>
+    </header>
+    <main class="main">
+
+        <!-- BANNER -->
+        <div class="banner">
+            <div class="banner-container">
+                <div th:if="${#lists.isEmpty(bannerImages)}" class="banner-default">
+                    <div style="width:100%;height:400px;background:#2d2d2d;display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:bold;">
+                        Welcome to Mall
+                    </div>
+                </div>
+                <div th:if="${!#lists.isEmpty(bannerImages)}" class="banner-slides">
+                    <div th:each="banner, iterStat : ${bannerImages}" 
+                         th:class="${#lists.size(bannerImages) == 1 ? 'banner-slide single' : 'banner-slide multiple'}" 
+                         th:with="delay=${iterStat.index * 3}, duration=${#lists.size(bannerImages) * 3}"
+                         th:style="${#lists.size(bannerImages) > 1 ? 'animation-delay: ' + delay + 's; animation-duration: ' + duration + 's;' : ''}">
+                        <a th:if="${banner.url != null and banner.url != ''}" th:href="${banner.url}" target="_blank" class="banner-link">
+                            <img th:src="@{${banner.url}}" th:alt="'Banner'" class="banner-image">
+                        </a>
+                        <img th:if="${banner.url == null or banner.url == ''}" th:src="@{${banner.url}}" th:alt="'Banner'" class="banner-image">
+                    </div>
+                </div>
+                <div th:if="${!#lists.isEmpty(bannerImages) and #lists.size(bannerImages) > 1}" class="banner-dots">
+                    <span th:each="banner, iterStat : ${bannerImages}" 
+                          th:with="delay=${iterStat.index * 3}, duration=${#lists.size(bannerImages) * 3}"
+                          class="banner-dot" 
+                          th:style="'animation-delay: ' + delay + 's; animation-duration: ' + duration + 's;'"></span>
+                </div>
+            </div>
+        </div> 
+
+        <div class="home-images">
+            <div class="bottom-images" style="display:flex;gap:2rem;justify-content:center;width:100%;">
+                <!-- Digital Product Section -->
+                <div class="product-section" style="width:50%;border-radius:16px;box-shadow:0 2px 16px #000;overflow:hidden;position:relative;">
+                    <a th:if="${digitalUrl != null and digitalUrl != ''}" th:href="${digitalUrl}" target="_blank" style="display:block;width:100%;height:100%;">
+                        <img th:if="${digitalImageUrl != null}" th:src="@{${digitalImageUrl}}" alt="Digital Products" style="width:100%;height:auto;display:block;">
+                        <div th:if="${digitalImageUrl == null}" style="width:100%;height:300px;background:#2d2d2d;display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:bold;">Digital Products</div>
+                    </a>
+                    <div th:if="${digitalUrl == null or digitalUrl == ''}">
+                        <img th:if="${digitalImageUrl != null}" th:src="@{${digitalImageUrl}}" alt="Digital Products" style="width:100%;height:auto;display:block;">
+                        <div th:if="${digitalImageUrl == null}" style="width:100%;height:300px;background:#2d2d2d;display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:bold;">Digital Products</div>
+                    </div>
+                    <div class="product-label" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.7);color:#fff;padding:1rem;text-align:center;">
+                        <h3 th:text="${digitalTitle != null ? digitalTitle : 'Digital Products'}" style="margin:0;font-size:1.5rem;font-weight:bold;">Digital Products</h3>
+                    </div>
+                </div>
+                
+                <!-- Physical Product Section -->
+                <div class="product-section" style="width:50%;border-radius:16px;box-shadow:0 2px 16px #000;overflow:hidden;position:relative;">
+                    <a th:if="${physicalUrl != null and physicalUrl != ''}" th:href="${physicalUrl}" target="_blank" style="display:block;width:100%;height:100%;">
+                        <img th:if="${physicalImageUrl != null}" th:src="@{${physicalImageUrl}}" alt="Physical Products" style="width:100%;height:auto;display:block;">
+                        <div th:if="${physicalImageUrl == null}" style="width:100%;height:300px;background:#2d2d2d;display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:bold;">Physical Products</div>
+                    </a>
+                    <div th:if="${physicalUrl == null or physicalUrl == ''}">
+                        <img th:if="${physicalImageUrl != null}" th:src="@{${physicalImageUrl}}" alt="Physical Products" style="width:100%;height:auto;display:block;">
+                        <div th:if="${physicalImageUrl == null}" style="width:100%;height:300px;background:#2d2d2d;display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:bold;">Physical Products</div>
+                    </div>
+                    <div class="product-label" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.7);color:#fff;padding:1rem;text-align:center;">
+                        <h3 th:text="${physicalTitle != null ? physicalTitle : 'Physical Products'}" style="margin:0;font-size:1.5rem;font-weight:bold;">Physical Products</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer style="background:#222;color:#fff;padding:2rem 0;margin-top:2rem;">
+        <div style="max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+                <img th:src="@{${footerLogo}}" alt="Footer Logo" style="height:60px;">
+            </div>
+            <div>
+                <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                    <li th:each="link : ${footerLinks}">
+                        <a th:href="${link.url}" th:text="${link.name}" style="color:#fff;text-decoration:none;font-size:14px;line-height:1.5;"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html> 

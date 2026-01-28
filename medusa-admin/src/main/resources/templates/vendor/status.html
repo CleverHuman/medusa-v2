@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Status Tracking - Co-op Member Portal</title>
+    <meta name="vendor-member-token" th:content="${session.vendorMemberToken}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.4/main.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.4/main.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Redirect to noscript version if JavaScript is disabled -->
+    <noscript>
+        <meta http-equiv="refresh" content="0;url=/mall/static/vendor/status?noscript=true">
+    </noscript>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .status-card {
+            transition: all 0.3s ease;
+        }
+        .status-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+        }
+        .timeline-item {
+            position: relative;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 40px;
+            bottom: -20px;
+            width: 2px;
+            background: #e5e7eb;
+        }
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        .timeline-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+        .timeline-dot.completed {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        .timeline-dot.active {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        .timeline-dot.pending {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .search-input {
+            transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-gray-900">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md fixed w-full top-0 z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-amber-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">V</span>
+                    </div>
+                    <span class="text-xl font-bold text-gray-900">Co-op Member Portal</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/mall/static/vendor/status" class="text-blue-600 font-semibold">Dashboard</a>
+                    <a href="/mall/static/vendor/application" class="text-gray-600 hover:text-blue-600 transition-colors">Application</a>
+                    <a href="/mall/static/vendor/products" class="text-gray-600 hover:text-blue-600 transition-colors">Products</a>
+                    <a href="/mall/static/vendor/orders" class="text-gray-600 hover:text-blue-600 transition-colors">Orders</a>
+                    <a href="/mall/static/vendor/bond-level" class="text-gray-600 hover:text-blue-600 transition-colors">Bond & Level</a>
+                    <a href="/mall/static/vendor/withdrawal" class="text-gray-600 hover:text-blue-600 transition-colors">Withdrawal</a>
+                    <!-- Auth status will be injected here by vendor-auth-status.js -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-20 min-h-screen">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <!-- Page Title -->
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-blue-200 rounded-full bg-blue-50 mb-4">
+                    <span class="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_0_3px_rgba(59,130,246,0.2)]"></span>
+                    <span class="text-sm font-semibold tracking-wide text-blue-700">Co-op Member Application</span>
+                </div>
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Membership Application Status</h1>
+                <p class="text-xl text-gray-600 mb-4">Track your Co-op Member (CM) application progress through bond review, eligibility checks, and approval</p>
+                <div class="flex flex-wrap justify-center gap-3 mt-4">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg bg-gray-50 text-sm font-semibold text-gray-700">
+                        <span>🛡</span> Bond-backed accountability
+                    </div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg bg-gray-50 text-sm font-semibold text-gray-700">
+                        <span>⚖</span> Dispute resolution
+                    </div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg bg-gray-50 text-sm font-semibold text-gray-700">
+                        <span>🗳</span> Member governance
+                    </div>
+                </div>
+            </div>
+
+            <!-- Application History Section -->
+            <div id="applicationHistorySection" class="hidden bg-white rounded-2xl shadow-lg p-8 mb-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-semibold text-gray-900">My Membership Applications</h2>
+                    <button onclick="loadMyApplications()" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                        Refresh
+                    </button>
+                </div>
+                <div id="applicationHistoryList" class="space-y-4">
+                    <!-- Application history will be loaded here -->
+                </div>
+                <div id="noApplicationsMessage" class="hidden text-center py-8">
+                    <div class="text-gray-400 mb-4">
+                        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">No Applications Found</h3>
+                    <p class="text-gray-500 mb-4">You haven't submitted a Co-op Member application yet.</p>
+                    <a href="/mall/static/vendor/application" class="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Apply for Co-op Membership
+                    </a>
+                </div>
+            </div>
+
+            <!-- Search Section -->
+            <div id="searchSection" class="hidden bg-white rounded-2xl shadow-lg p-8 mb-8">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-6">Find Application</h2>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Application ID</label>
+                        <input type="text" id="applicationId" placeholder="Enter Application ID, e.g.: VENDOR-123456-ABC123" 
+                               class="search-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="searchApplication()" 
+                                class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                            Search Application
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-4 text-sm text-gray-500">
+                    Tip: Application ID can be found in the confirmation page when submitting your application
+                </div>
+            </div>
+
+            <!-- Application Details Section -->
+            <div id="applicationDetails" class="hidden">
+                <!-- Application Info Card -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h2 class="text-2xl font-semibold text-gray-900 mb-2">Application Details</h2>
+                            <p class="text-gray-600">Application ID: <span id="detailApplicationId" class="font-semibold text-blue-600"></span></p>
+                        </div>
+                        <div id="currentStatus" class="px-4 py-2 rounded-full text-sm font-semibold"></div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+                            <div class="space-y-3">
+                                <div><span class="text-gray-600">Co-op Member Name:</span><span id="vendorNameDetail" class="font-medium"></span></div>
+                                <div><span class="text-gray-600">Location:</span><span id="locationDetail" class="font-medium"></span></div>
+                                <div><span class="text-gray-600">Product Categories:</span><span id="productCategoriesDetail" class="font-medium"></span></div>
+                                <div><span class="text-gray-600">Application Date:</span><span id="applicationDate" class="font-medium"></span></div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Processing Statistics</h3>
+                            <div class="space-y-3">
+                                <div><span class="text-gray-600">Queue Position:</span><span id="queuePosition" class="font-medium text-blue-600"></span></div>
+                                <div><span class="text-gray-600">Estimated Processing Time:</span><span id="estimatedTime" class="font-medium"></span></div>
+                                <div><span class="text-gray-600">Reviewer:</span><span id="reviewer" class="font-medium"></span></div>
+                                <div><span class="text-gray-600">Last Update:</span><span id="lastUpdate" class="font-medium"></span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Processing Progress Timeline -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-6">Processing Progress</h2>
+                    <div id="timeline" class="space-y-6">
+                        <!-- Timeline items will be generated dynamically by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Bond Paid Status Section -->
+                <div id="bondPaidSection" class="hidden bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl shadow-lg p-8 mb-8 border-2 border-green-200">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                        <span class="text-4xl mr-3">✅</span>
+                        Bond Payment Completed
+                    </h2>
+                    
+                    <!-- Bond Payment Success Info -->
+                    <div class="bg-white border-l-4 border-green-500 rounded-lg p-6 mb-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-900 mb-2">Payment Confirmed</h3>
+                                <p class="text-sm text-gray-600">Your bond payment has been successfully processed.</p>
+                            </div>
+                            <div class="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
+                                ✓ Paid
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 mt-4 pt-4 border-t border-gray-200">
+                            <div>
+                                <p class="text-sm text-gray-600 mb-1">Order Number</p>
+                                <p class="text-lg font-mono font-semibold text-gray-900" id="bondOrderNumber">-</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 mb-1">Payment Date</p>
+                                <p class="text-lg font-semibold text-gray-900" id="bondPaidDate">-</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 mb-1">Bond Level</p>
+                                <p class="text-lg font-semibold text-blue-600" id="bondPaidLevel">-</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 mb-1">Bond Amount</p>
+                                <p class="text-lg font-semibold text-gray-900">$<span id="bondPaidAmount">-</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Next Steps -->
+                    <div id="bondPaidNextSteps" class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h4 class="font-semibold text-blue-900 mb-2">📋 Next Steps</h4>
+                        <ul class="text-sm text-blue-800 space-y-1" id="bondPaidStepsList">
+                            <!-- Steps will be populated by JavaScript -->
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Wallet Address Input Section (After Bond Paid) -->
+                <div id="walletAddressSection" class="hidden bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl shadow-lg p-8 mb-8 border-2 border-green-200">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                        <span class="text-4xl mr-3">💳</span>
+                        Withdrawal Wallet Addresses
+                    </h2>
+                    
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-yellow-800">
+                                    <strong>Important:</strong> A 1-day withdrawal lock will be triggered after changing the withdrawal address.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form id="walletAddressForm" onsubmit="submitWalletAddresses(event)">
+                        <div class="space-y-6">
+                            <!-- BTC Address -->
+                            <div class="bg-white rounded-lg p-6 border border-gray-200">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="text-2xl mr-2">₿</span>
+                                    Bitcoin (BTC) Address
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="btcAddress" 
+                                    name="btcAddress"
+                                    placeholder="Enter your BTC withdrawal address"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-mono text-sm"
+                                    required
+                                />
+                                <p class="text-xs text-gray-500 mt-2">This address will be used for BTC withdrawals</p>
+                            </div>
+                            
+                            <!-- USDT (TRON) Address -->
+                            <div class="bg-white rounded-lg p-6 border border-gray-200">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="text-2xl mr-2">₮</span>
+                                    Tether USDT (TRON Network) Address
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="usdtAddress" 
+                                    name="usdtAddress"
+                                    placeholder="Enter your USDT (TRC20) withdrawal address"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-mono text-sm"
+                                    required
+                                />
+                                <p class="text-xs text-gray-500 mt-2">This address will be used for USDT (TRC20) withdrawals</p>
+                            </div>
+                            
+                            <!-- XMR Address -->
+                            <div class="bg-white rounded-lg p-6 border border-gray-200">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="text-2xl mr-2">ɱ</span>
+                                    Monero (XMR) Address
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="xmrAddress" 
+                                    name="xmrAddress"
+                                    placeholder="Enter your XMR withdrawal address"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-mono text-sm"
+                                    required
+                                />
+                                <p class="text-xs text-gray-500 mt-2">This address will be used for XMR withdrawals</p>
+                            </div>
+                        </div>
+                        
+                        <button 
+                            type="submit" 
+                            id="submitWalletBtn"
+                            class="w-full mt-6 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 rounded-lg font-bold text-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span class="flex items-center justify-center">
+                                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Submit Wallet Addresses
+                            </span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Bond Payment Section -->
+                <div id="bondPaymentSection" class="hidden bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl shadow-lg p-8 mb-8 border-2 border-amber-200">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6 flex items-center">
+                        <span class="text-4xl mr-3">💰</span>
+                        Bond Payment Required
+                    </h2>
+                    
+                    <!-- Bond Level Info -->
+                    <div class="bg-white border-l-4 border-amber-500 rounded-lg p-6 mb-6 shadow-sm">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-4">Your Assigned Bond Level</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <p class="text-sm text-gray-600 mb-2">Bond Level</p>
+                                <p class="text-3xl font-bold text-amber-600" id="bondLevel">-</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 mb-2">Required Bond Amount</p>
+                                <p class="text-3xl font-bold text-gray-900">$<span id="bondAmount">-</span></p>
+                                <p class="text-xs text-gray-500 mt-1">AUD</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <p class="text-sm text-gray-700 mb-2"><strong>Payout Time:</strong> <span id="bondPayoutTime" class="text-blue-600 font-semibold">-</span></p>
+                            <p class="text-sm text-gray-700"><strong>Tax Discount:</strong> <span id="bondTaxDiscount" class="text-green-600 font-semibold">-</span>%</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Bond Rules Display (Collapsible) -->
+                    <details class="bg-white border border-gray-200 rounded-lg mb-6 shadow-sm">
+                        <summary class="cursor-pointer px-6 py-4 font-semibold text-gray-800 hover:bg-gray-50 transition-colors rounded-lg">
+                            📜 View Complete Bond Rules & Terms (Click to expand)
+                        </summary>
+                        <div id="bondRulesContent" class="px-6 py-4 prose prose-sm max-w-none border-t border-gray-200">
+                            <!-- Markdown content will be rendered here -->
+                            <p class="text-gray-500">Loading bond rules...</p>
+                        </div>
+                    </details>
+                    
+                    <!-- Level Perks Preview -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                        <h4 class="font-semibold text-blue-900 mb-2">🎁 Level Perks:</h4>
+                        <div id="bondLevelPerks" class="text-sm text-blue-800 whitespace-pre-line">
+                            Loading perks...
+                        </div>
+                    </div>
+                    
+                    <!-- Agreement Checkbox -->
+                    <label class="flex items-start space-x-3 mb-6 bg-white p-4 rounded-lg border border-gray-300 cursor-pointer hover:bg-gray-50 transition-colors">
+                        <input type="checkbox" id="acceptBondTerms" class="mt-1 w-5 h-5 text-blue-600 rounded">
+                        <span class="text-sm text-gray-700 flex-1">
+                            <strong>I have read and agree to the Bond Rules and Terms & Conditions.</strong>
+                            <br>
+                            <span class="text-gray-600">I understand that:</span>
+                            <ul class="list-disc ml-5 mt-2 space-y-1 text-gray-600">
+                                <li>The bond is required to activate my Co-op Member account</li>
+                                <li>Bond violations may result in deductions</li>
+                                <li>Payment must be completed to proceed with account activation</li>
+                            </ul>
+                        </span>
+                    </label>
+                    
+                    <!-- Pay Bond Button -->
+                    <button 
+                        id="payBondBtn" 
+                        onclick="proceedToBondPayment()" 
+                        disabled
+                        class="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white py-4 rounded-lg font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed hover:from-amber-600 hover:to-orange-700 transition-all shadow-lg disabled:shadow-none transform hover:scale-[1.02] disabled:transform-none">
+                        <span class="flex items-center justify-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                            Proceed to Pay Bond
+                        </span>
+                    </button>
+                    
+                    <p class="text-center text-sm text-gray-500 mt-4">
+                        🔒 Secure payment via platform's encrypted payment system
+                    </p>
+                </div>
+
+                <!-- Interview Information -->
+                <div id="interviewSection" class="bg-white rounded-2xl shadow-lg p-8 mb-8 hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold text-gray-900">📅 Interview Schedule</h2>
+                        <div class="flex items-center space-x-3">
+                            <button id="bookInterviewBtn" onclick="showBookingModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                                Book Interview
+                            </button>
+                            <div class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold">
+                                Interview Required
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interview Cards Container -->
+                    <div id="interviewCards" class="space-y-4">
+                        <!-- Interview cards will be generated by JavaScript -->
+                    </div>
+
+                    <!-- No Interview Scheduled -->
+                    <div id="noInterview" class="hidden text-center py-8">
+                        <div class="text-gray-400 mb-4">
+                            <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">Interview Not Yet Scheduled</h3>
+                        <p class="text-gray-500 mb-4">Browse available time slots and book your interview</p>
+                        <button onclick="showBookingModal()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            Browse Available Slots
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Review Details -->
+                <div class="bg-white rounded-2xl shadow-lg p-8">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-6">Review Details</h2>
+                    <div id="reviewDetails" class="space-y-4">
+                        <!-- Review details will be generated dynamically by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <div class="flex items-center justify-center space-x-3 mb-4">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-amber-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">CM</span>
+                    </div>
+                    <span class="text-xl font-bold">Co-op Member Portal</span>
+                </div>
+                <p class="text-gray-400 mb-4">Bond-backed accountability, dispute resolution, and member governance</p>
+                <p class="text-gray-500 text-sm">© 2024 Co-op Member Portal. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-2xl font-semibold text-gray-900">Book Interview Slot</h3>
+                <div class="flex items-center space-x-3">
+                    <button id="calendarPrevBtn" class="px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-100 text-sm">
+                        Previous
+                    </button>
+                    <button id="calendarNextBtn" class="px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-100 text-sm">
+                        Next
+                    </button>
+                    <button onclick="closeBookingModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="relative flex-1">
+                <div id="calendarLoading" class="hidden absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 z-10">
+                    <div class="flex flex-col items-center">
+                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        <p class="mt-3 text-gray-500">Loading available slots...</p>
+                    </div>
+                </div>
+                <div id="slotCalendar" class="p-4"></div>
+                <div id="calendarEmpty" class="hidden absolute inset-0 flex items-center justify-center flex-col text-gray-500">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <p class="font-medium">No available slots in the current view.</p>
+                    <p class="text-sm text-gray-400">Try switching to another week or contact support for help.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/vendor/logger.js}"></script>
+    <script th:src="@{/vendor/api-config.js}"></script>
+    <script th:src="@{/vendor/interview.js}"></script>
+    <script th:src="@{/vendor/status.js}"></script>
+    <script>
+        // Booking modal functions
+        let currentApplicationNumber = '';
+
+        window.currentApplicationNumber = '';
+
+        function showBookingModal() {
+            const applicationId = document.getElementById('detailApplicationId')?.textContent;
+            if (!applicationId) {
+                alert('Please select an application first');
+                return;
+            }
+            window.currentApplicationNumber = applicationId.trim();
+            document.getElementById('bookingModal').classList.remove('hidden');
+
+            // Initialize calendar
+            const calendarEl = document.getElementById('slotCalendar');
+            const loadingEl = document.getElementById('calendarLoading');
+            const emptyEl = document.getElementById('calendarEmpty');
+            InterviewAPI.initCalendar(calendarEl, loadingEl, emptyEl);
+
+            document.getElementById('calendarPrevBtn').onclick = () => {
+                if (InterviewAPI.calendar) {
+                    InterviewAPI.calendar.prev();
+                }
+            };
+
+            document.getElementById('calendarNextBtn').onclick = () => {
+                if (InterviewAPI.calendar) {
+                    InterviewAPI.calendar.next();
+                }
+            };
+        }
+
+        function closeBookingModal() {
+            document.getElementById('bookingModal').classList.add('hidden');
+            if (InterviewAPI.calendar) {
+                InterviewAPI.calendar.destroy();
+                InterviewAPI.calendar = null;
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('bookingModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeBookingModal();
+            }
+        });
+    </script>
+    <script th:src="@{/vendor/logger.js}"></script>
+    <script th:src="@{/vendor/api-config.js}"></script>
+    <script th:src="@{/vendor/vendor-auth-status.js}"></script>
+    <script>
+        // 初始化登录状态显示
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.Logger) {
+                window.Logger.log('=== Status Page Loaded ===');
+                window.Logger.log('window.API available:', typeof window.API !== 'undefined');
+                window.Logger.log('window.VendorAuthStatus available:', typeof window.VendorAuthStatus !== 'undefined');
+            }
+            
+            if (window.VendorAuthStatus) {
+                if (window.Logger) {
+                    window.Logger.log('Initializing VendorAuthStatus on Status page...');
+                }
+                VendorAuthStatus.init({
+                    showInNav: true,
+                    showFloating: false,
+                    requiredLogin: false  // Status 页面不要求登录
+                });
+            } else {
+                if (window.Logger) {
+                    window.Logger.error('VendorAuthStatus not available!');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

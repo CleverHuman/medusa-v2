@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bond & Level - Co-op Member Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Redirect to noscript version if JavaScript is disabled -->
+    <noscript>
+        <meta http-equiv="refresh" content="0;url=/mall/static/vendor/bond-level?noscript=true">
+    </noscript>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+        }
+        .level-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        .level-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .level-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+        .level-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+        .level-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; }
+        .level-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; }
+        .progress-bar {
+            transition: width 1s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md fixed w-full top-0 z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-amber-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">V</span>
+                    </div>
+                    <span class="text-xl font-bold text-gray-900">Co-op Member Portal</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/mall/static/vendor/status" class="text-gray-600 hover:text-blue-600 transition-colors">Dashboard</a>
+                    <a href="/mall/static/vendor/application" class="text-gray-600 hover:text-blue-600 transition-colors">Application</a>
+                    <a href="/mall/static/vendor/products" class="text-gray-600 hover:text-blue-600 transition-colors">Products</a>
+                    <a href="/mall/static/vendor/orders" class="text-gray-600 hover:text-blue-600 transition-colors">Orders</a>
+                    <a href="/mall/static/vendor/bond-level" class="text-blue-600 font-semibold">Bond & Level</a>
+                    <a href="/mall/static/vendor/withdrawal" class="text-gray-600 hover:text-blue-600 transition-colors">Withdrawal</a>
+                    <!-- Auth status will be injected here by vendor-auth-status.js -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-20 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-blue-200 rounded-full bg-blue-50 mb-3">
+                    <span class="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_0_3px_rgba(59,130,246,0.2)]"></span>
+                    <span class="text-sm font-semibold tracking-wide text-blue-700">Bond-Backed Protection</span>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-900">Bond & Level Management</h1>
+                <p class="text-gray-600 mt-2">Track your bond-secured membership status, level progress, and reputation-based trade capacity. Bond-backed accountability protects both buyers and members.</p>
+                <div class="flex flex-wrap gap-3 mt-4">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg bg-gray-50 text-sm font-semibold text-gray-700">
+                        <span>🛡</span> Bond-secured enforcement
+                    </div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg bg-gray-50 text-sm font-semibold text-gray-700">
+                        <span>⚖</span> Dispute resolution
+                    </div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg bg-gray-50 text-sm font-semibold text-gray-700">
+                        <span>🧯</span> Liquidation safeguards
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="flex justify-center items-center py-12">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="hidden bg-red-50 border border-red-200 rounded-xl p-6 mb-8">
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p id="errorMessage" class="text-red-800"></p>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div id="mainContent" class="hidden">
+                <!-- Level Badge & Overview -->
+                <div class="bg-white rounded-xl shadow-md p-8 mb-8">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">Current Level</h2>
+                            <p class="text-gray-600">Your Co-op Member level based on reputation, bond status, and trade capacity</p>
+                        </div>
+                        <div id="levelBadge" class="level-badge level-1 mt-4 md:mt-0">
+                            Level 1
+                        </div>
+                    </div>
+
+                    <!-- Next Level Progress -->
+                    <div id="nextLevelSection" class="mt-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium text-gray-700">Progress to Level <span id="nextLevelNumber">2</span></span>
+                            <span class="text-sm font-semibold text-gray-900"><span id="progressPercentage">0</span>%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div id="progressBar" class="progress-bar bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between items-center mt-2 text-xs text-gray-500">
+                            <span><span id="currentPoints">0</span> points</span>
+                            <span><span id="nextLevelThreshold">1,000</span> points needed</span>
+                        </div>
+                        <div class="mt-4 text-sm text-gray-600">
+                            <span id="pointsToNextLevel">0</span> more points needed to reach Level <span id="nextLevelDisplay">2</span>
+                        </div>
+                    </div>
+
+                    <!-- Max Level Message -->
+                    <div id="maxLevelMessage" class="hidden mt-6 p-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg text-white">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                            </svg>
+                            <div>
+                                <p class="font-semibold">Maximum Level Achieved!</p>
+                                <p class="text-sm">Congratulations! You've reached the highest Co-op Member level.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <!-- Bond Amount -->
+                    <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md p-6 text-white">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <p class="text-blue-100 text-sm font-medium">Bond Amount</p>
+                                <p id="bondAmount" class="text-3xl font-bold">$0.00</p>
+                            </div>
+                            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sales Points -->
+                    <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-md p-6 text-white">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <p class="text-purple-100 text-sm font-medium">Sales Points</p>
+                                <p id="salesPoints" class="text-3xl font-bold">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-purple-100 text-xs">1 point = $1 sold</p>
+                    </div>
+
+                    <!-- Max Sales Limit -->
+                    <div class="stat-card bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-md p-6 text-white">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <p class="text-green-100 text-sm font-medium">Max Sales Limit</p>
+                                <p id="maxSalesLimit" class="text-3xl font-bold">$0.00</p>
+                            </div>
+                            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-green-100 text-xs">Bond × Level</p>
+                    </div>
+
+                    <!-- Available Capacity -->
+                    <div class="stat-card bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-md p-6 text-white">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <p class="text-orange-100 text-sm font-medium">Available Capacity</p>
+                                <p id="availableCapacity" class="text-3xl font-bold">$0.00</p>
+                            </div>
+                            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-orange-100 text-xs">Remaining sales capacity</p>
+                    </div>
+                </div>
+
+                <!-- Balance Information -->
+                <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Balance Information</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Withdrawable Balance -->
+                        <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg p-6 border border-emerald-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <p class="text-emerald-700 text-sm font-medium">Withdrawable Balance</p>
+                                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <p id="withdrawableBalance" class="text-3xl font-bold text-emerald-900">$0.00</p>
+                            <p class="text-emerald-600 text-xs mt-2">Available for withdrawal</p>
+                        </div>
+
+                        <!-- Pending Balance -->
+                        <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-6 border border-amber-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <p class="text-amber-700 text-sm font-medium">Pending Balance</p>
+                                <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <p id="pendingBalance" class="text-3xl font-bold text-amber-900">$0.00</p>
+                            <p class="text-amber-600 text-xs mt-2">Shipped orders awaiting release</p>
+                        </div>
+
+                        <!-- Total Withdrawn -->
+                        <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-6 border border-slate-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <p class="text-slate-700 text-sm font-medium">Total Withdrawn</p>
+                                <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <p id="totalWithdrawn" class="text-3xl font-bold text-slate-900">$0.00</p>
+                            <p class="text-slate-600 text-xs mt-2">All-time withdrawal amount</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Balance Explanation -->
+                    <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <h4 class="text-sm font-semibold text-blue-900 mb-2">Balance Explanation:</h4>
+                        <ul class="text-xs text-blue-800 space-y-1">
+                            <li><strong>Withdrawable Balance:</strong> Funds ready for immediate withdrawal. Released from pending balance after the delay period based on your vendor level.</li>
+                            <li><strong>Pending Balance:</strong> Funds from shipped orders that are waiting to be released. The release delay depends on your vendor level (Level 1: 7 days, Level 2: 5 days, Level 3: 3 days, Level 4: 1 day, Level 5: 0 days).</li>
+                            <li><strong>Current Pending Sales:</strong> Total amount of orders that are paid but not yet shipped. These orders reduce your available sales capacity.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Sales Capacity Details -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <!-- Current Pending Sales -->
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Current Pending Sales</h3>
+                        <div class="flex items-center justify-between">
+                            <p id="currentPendingSales" class="text-3xl font-bold text-gray-900">$0.00</p>
+                            <div class="text-sm text-gray-500">
+                                <p>Orders not yet shipped</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sales Capacity Chart -->
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Sales Capacity Overview</h3>
+                        <div id="capacityChart" style="width: 100%; height: 250px;"></div>
+                    </div>
+                </div>
+
+                <!-- Level History -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Level Upgrade History</h3>
+                    <div id="levelHistoryContainer">
+                        <!-- History will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/vendor/logger.js}"></script>
+    <script th:src="@{/vendor/api-config.js}"></script>
+    <script th:src="@{/vendor/vendor-auth-status.js}"></script>
+    <script th:src="@{/vendor/vendor-bond-level.js}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.VendorAuthStatus) {
+                VendorAuthStatus.init({
+                    showInNav: true,
+                    showFloating: false,
+                    requiredLogin: true,
+                    autoRedirect: true
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+

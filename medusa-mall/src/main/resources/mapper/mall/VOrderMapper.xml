@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.VOrderMapper">
+    <select id="selectVOrderList" resultType="java.util.Map">
+        SELECT 
+            o.id,
+            o.order_sn,
+            o.create_time,
+            o.coupon_id AS code,
+            o.source_type AS channel,
+            o.member_id,
+            o.remark,
+            MAX(o.customer_comment) AS customer_comment,
+            COALESCE(m.username, CONCAT('Guest_', ABS(o.member_id + 1000000))) AS username,
+            GROUP_CONCAT(oi.product_id SEPARATOR '; ') AS procode,
+            GROUP_CONCAT(oi.product_spec SEPARATOR '; ') AS amt,
+            GROUP_CONCAT(oi.price SEPARATOR '; ') AS price,
+            GROUP_CONCAT(oi.quantity SEPARATOR '; ') AS qty,
+            MAX(s.shipping_method) AS postage,
+            MAX(sm.name) AS shipping_method_name,
+            MAX(o.freight_amount) AS freight_amount,
+            MAX(s.receiver_name) AS receiver_name,
+            MAX(s.address_line1) AS address_line1,
+            MAX(s.address_line2) AS address_line2,
+            MAX(s.address_line3) AS address_line3,
+            MAX(s.city) AS city,
+            MAX(s.state) AS state,
+            MAX(s.post_code) AS post_code,
+            MAX(s.country) AS country,
+            GROUP_CONCAT(oi.total_coin SEPARATOR '; ') AS tcoin,
+            MAX(p.paidcoin) AS paidcoin,
+            GROUP_CONCAT(oi.total_price SEPARATOR '; ') AS tamt,
+            MAX(p.pay_type) AS cointype,
+            MAX(o.status) AS status,
+            MAX(o.isdispute) AS isdispute,
+            MAX(s.shipping_number) AS shipping_number
+        FROM mall_order o
+        LEFT JOIN mall_member m ON m.member_id = o.member_id
+    LEFT JOIN mall_order_item oi ON o.id = oi.order_id
+    LEFT JOIN mall_order_shipping s ON o.id = s.order_id
+    LEFT JOIN mall_order_payment p ON o.id = p.order_id
+    LEFT JOIN mall_shipping_method sm ON s.shipping_method COLLATE utf8mb4_unicode_ci = sm.code COLLATE utf8mb4_unicode_ci
+        <where>
+            <!-- 过滤掉已删除的订单 (status = 5) -->
+            AND o.status != 5
+            <if test="orderSn != null and orderSn != ''">
+                AND o.order_sn = #{orderSn}
+            </if>
+            <if test="username != null and username != ''">
+                AND (m.username = #{username} OR (m.username IS NULL AND CONCAT('Guest_', ABS(o.member_id + 1000000)) = #{username}))
+            </if>
+            <if test="status != null">
+                AND o.status = #{status}
+            </if>
+            <if test="memberId != null">
+                AND (
+                    o.member_id = #{memberId}
+                    OR o.member_id IN (
+                        SELECT linked_account 
+                        FROM mall_member 
+                        WHERE member_id = #{memberId} 
+                        AND linked_account IS NOT NULL
+                    )
+                    OR o.member_id IN (
+                        SELECT member_id 
+                        FROM mall_member 
+                        WHERE linked_account = #{memberId}
+                    )
+                )
+            </if>
+            <if test="isDispute != null">
+                AND o.isdispute = #{isDispute}
+            </if>
+            <if test="orderIds != null and orderIds != ''">
+                AND FIND_IN_SET(o.id, #{orderIds}) > 0
+            </if>
+            <if test="vendorId != null">
+                AND o.vendor_id = #{vendorId}
+            </if>
+            <if test="params != null">
+                <if test="params.beginTime != null and params.beginTime != ''">
+                    AND o.create_time &gt;= #{params.beginTime}
+                </if>
+                <if test="params.endTime != null and params.endTime != ''">
+                    AND o.create_time &lt;= #{params.endTime}
+                </if>
+            </if>
+        </where>
+        GROUP BY o.order_sn
+        ORDER BY o.create_time DESC
+    </select>
+</mapper> 

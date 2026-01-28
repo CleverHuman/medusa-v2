@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.PgpKeyMapper">
+    
+    <resultMap type="PgpKey" id="PgpKeyResult">
+        <result property="id" column="id"/>
+        <result property="keyName" column="key_name"/>
+        <result property="keyType" column="key_type"/>
+        <result property="keyId" column="key_id"/>
+        <result property="fingerprint" column="fingerprint"/>
+        <result property="keyData" column="key_data"/>
+        <result property="keySize" column="key_size"/>
+        <result property="algorithm" column="algorithm"/>
+        <result property="isActive" column="is_active"/>
+        <result property="isDefault" column="is_default"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="expiresAt" column="expires_at"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectPgpKeyVo">
+        select id, key_name, key_type, key_id, fingerprint, key_data, key_size, algorithm, is_active, is_default, created_at, expires_at, create_time, update_time, update_by, remark from mall_pgp_keys
+    </sql>
+
+    <select id="selectPgpKeyList" parameterType="PgpKey" resultMap="PgpKeyResult">
+        <include refid="selectPgpKeyVo"/>
+        <where>  
+            <if test="keyName != null  and keyName != ''"> and key_name like concat('%', #{keyName}, '%')</if>
+            <if test="keyType != null  and keyType != ''"> and key_type = #{keyType}</if>
+            <if test="keyId != null  and keyId != ''"> and key_id = #{keyId}</if>
+            <if test="fingerprint != null  and fingerprint != ''"> and fingerprint like concat('%', #{fingerprint}, '%')</if>
+            <if test="algorithm != null  and algorithm != ''"> and algorithm = #{algorithm}</if>
+            <if test="isActive != null "> and is_active = #{isActive}</if>
+            <if test="isDefault != null "> and is_default = #{isDefault}</if>
+        </where>
+        order by create_time desc
+    </select>
+    
+    <select id="selectPgpKeyById" parameterType="Long" resultMap="PgpKeyResult">
+        <include refid="selectPgpKeyVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectPgpKeyByType" parameterType="String" resultMap="PgpKeyResult">
+        <include refid="selectPgpKeyVo"/>
+        where key_type = #{keyType} and is_active = 1
+        limit 1
+    </select>
+
+    <select id="selectDefaultPgpKey" resultMap="PgpKeyResult">
+        <include refid="selectPgpKeyVo"/>
+        where is_default = 1 and is_active = 1
+        limit 1
+    </select>
+
+    <select id="selectActivePgpKeys" resultMap="PgpKeyResult">
+        <include refid="selectPgpKeyVo"/>
+        where is_active = 1
+        order by is_default desc, create_time desc
+    </select>
+        
+    <insert id="insertPgpKey" parameterType="PgpKey" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_pgp_keys
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="keyName != null and keyName != ''">key_name,</if>
+            <if test="keyType != null and keyType != ''">key_type,</if>
+            <if test="keyId != null and keyId != ''">key_id,</if>
+            <if test="fingerprint != null and fingerprint != ''">fingerprint,</if>
+            <if test="keyData != null and keyData != ''">key_data,</if>
+            <if test="keySize != null">key_size,</if>
+            <if test="algorithm != null and algorithm != ''">algorithm,</if>
+            <if test="isActive != null">is_active,</if>
+            <if test="isDefault != null">is_default,</if>
+            <if test="createdAt != null">created_at,</if>
+            <if test="expiresAt != null">expires_at,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="keyName != null and keyName != ''">#{keyName},</if>
+            <if test="keyType != null and keyType != ''">#{keyType},</if>
+            <if test="keyId != null and keyId != ''">#{keyId},</if>
+            <if test="fingerprint != null and fingerprint != ''">#{fingerprint},</if>
+            <if test="keyData != null and keyData != ''">#{keyData},</if>
+            <if test="keySize != null">#{keySize},</if>
+            <if test="algorithm != null and algorithm != ''">#{algorithm},</if>
+            <if test="isActive != null">#{isActive},</if>
+            <if test="isDefault != null">#{isDefault},</if>
+            <if test="createdAt != null">#{createdAt},</if>
+            <if test="expiresAt != null">#{expiresAt},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePgpKey" parameterType="PgpKey">
+        update mall_pgp_keys
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="keyName != null and keyName != ''">key_name = #{keyName},</if>
+            <if test="keyType != null and keyType != ''">key_type = #{keyType},</if>
+            <if test="keyId != null and keyId != ''">key_id = #{keyId},</if>
+            <if test="fingerprint != null and fingerprint != ''">fingerprint = #{fingerprint},</if>
+            <if test="keyData != null and keyData != ''">key_data = #{keyData},</if>
+            <if test="keySize != null">key_size = #{keySize},</if>
+            <if test="algorithm != null and algorithm != ''">algorithm = #{algorithm},</if>
+            <if test="isActive != null">is_active = #{isActive},</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            <if test="createdAt != null">created_at = #{createdAt},</if>
+            <if test="expiresAt != null">expires_at = #{expiresAt},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePgpKeyById" parameterType="Long">
+        delete from mall_pgp_keys where id = #{id}
+    </delete>
+
+    <delete id="deletePgpKeyByIds" parameterType="String">
+        delete from mall_pgp_keys where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper> 

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.VendorBotKeywordMapper">
+    
+    <resultMap type="com.medusa.mall.domain.vendor.VendorBotKeyword" id="VendorBotKeywordResult">
+        <result property="id" column="id" />
+        <result property="vendorId" column="vendor_id" />
+        <result property="keyword" column="keyword" />
+        <result property="keywordType" column="keyword_type" />
+        <result property="severity" column="severity" />
+        <result property="isActive" column="is_active" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectVendorBotKeywordVo">
+        select id, vendor_id, keyword, keyword_type, severity, is_active, create_time, update_time
+        from mall_vendor_bot_keywords
+    </sql>
+
+    <select id="selectVendorBotKeywordList" parameterType="com.medusa.mall.domain.vendor.VendorBotKeyword" resultMap="VendorBotKeywordResult">
+        <include refid="selectVendorBotKeywordVo"/>
+        <where>
+            <if test="vendorId != null">and vendor_id = #{vendorId}</if>
+            <if test="vendorId == null">and vendor_id is null</if>
+            <if test="isActive != null">and is_active = #{isActive}</if>
+        </where>
+        order by create_time desc
+    </select>
+    
+    <select id="selectVendorBotKeywordById" parameterType="Long" resultMap="VendorBotKeywordResult">
+        <include refid="selectVendorBotKeywordVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertVendorBotKeyword" parameterType="com.medusa.mall.domain.vendor.VendorBotKeyword" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_vendor_bot_keywords
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="vendorId != null">vendor_id,</if>
+            <if test="keyword != null">keyword,</if>
+            <if test="keywordType != null">keyword_type,</if>
+            <if test="severity != null">severity,</if>
+            <if test="isActive != null">is_active,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+            create_time,
+            update_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="vendorId != null">#{vendorId},</if>
+            <if test="keyword != null">#{keyword},</if>
+            <if test="keywordType != null">#{keywordType},</if>
+            <if test="severity != null">#{severity},</if>
+            <if test="isActive != null">#{isActive},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            now(),
+            now()
+        </trim>
+    </insert>
+
+    <update id="updateVendorBotKeyword" parameterType="com.medusa.mall.domain.vendor.VendorBotKeyword">
+        update mall_vendor_bot_keywords
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="vendorId != null">vendor_id = #{vendorId},</if>
+            <if test="keyword != null">keyword = #{keyword},</if>
+            <if test="keywordType != null">keyword_type = #{keywordType},</if>
+            <if test="severity != null">severity = #{severity},</if>
+            <if test="isActive != null">is_active = #{isActive},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = now()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteVendorBotKeywordById" parameterType="Long">
+        delete from mall_vendor_bot_keywords where id = #{id}
+    </delete>
+
+</mapper>

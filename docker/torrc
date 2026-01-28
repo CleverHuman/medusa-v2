@@ -1,0 +1,21 @@
+# === SOCKS Proxy ===
+# 绑定 SOCKS 代理端口，只监听本机和 Docker 网段
+SocksPort 127.0.0.1:9050
+SocksPort 172.17.0.1:9050
+
+# SocksPolicy
+SocksPolicy accept 127.0.0.1
+# docker network segment
+SocksPolicy accept 172.17.0.0/16
+SocksPolicy reject *
+
+# === Hidden Services ===
+# SSH Hidden Service -  6969
+HiddenServiceDir /var/lib/tor/hidden_service_ssh/
+HiddenServicePort 6969 127.0.0.1:6969
+
+# Nginx Hidden Service - 80
+HiddenServiceDir /var/lib/tor/hidden_service_nginx/
+HiddenServicePort 80 127.0.0.1:80
+
+# systemctl restart tor

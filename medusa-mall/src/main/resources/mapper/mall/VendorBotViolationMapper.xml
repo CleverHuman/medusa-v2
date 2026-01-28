@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.VendorBotViolationMapper">
+    
+    <resultMap type="com.medusa.mall.domain.vendor.VendorBotViolation" id="VendorBotViolationResult">
+        <result property="id" column="id" />
+        <result property="vendorId" column="vendor_id" />
+        <result property="orderId" column="order_id" />
+        <result property="userId" column="user_id" />
+        <result property="messageId" column="message_id" />
+        <result property="violationType" column="violation_type" />
+        <result property="matchedKeyword" column="matched_keyword" />
+        <result property="messageContent" column="message_content" />
+        <result property="penaltyAmount" column="penalty_amount" />
+        <result property="penaltyStatus" column="penalty_status" />
+        <result property="violationTime" column="violation_time" />
+        <result property="processedTime" column="processed_time" />
+        <result property="processNotes" column="process_notes" />
+    </resultMap>
+
+    <sql id="selectVendorBotViolationVo">
+        select id, vendor_id, order_id, user_id, message_id, violation_type,
+               matched_keyword, message_content, penalty_amount, penalty_status,
+               violation_time, processed_time, process_notes
+        from mall_vendor_bot_violations
+    </sql>
+
+    <select id="selectVendorBotViolationList" parameterType="com.medusa.mall.domain.vendor.VendorBotViolation" resultMap="VendorBotViolationResult">
+        <include refid="selectVendorBotViolationVo"/>
+        <where>
+            <if test="vendorId != null">and vendor_id = #{vendorId}</if>
+            <if test="orderId != null and orderId != ''">and order_id = #{orderId}</if>
+            <if test="penaltyStatus != null and penaltyStatus != ''">and penalty_status = #{penaltyStatus}</if>
+        </where>
+        order by violation_time desc
+    </select>
+    
+    <select id="selectVendorBotViolationById" parameterType="Long" resultMap="VendorBotViolationResult">
+        <include refid="selectVendorBotViolationVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="countTodayViolationsByVendorId" parameterType="Long" resultType="int">
+        select count(*) from mall_vendor_bot_violations
+        where vendor_id = #{vendorId}
+          and DATE(violation_time) = CURDATE()
+          and penalty_status = 'processed'
+    </select>
+        
+    <insert id="insertVendorBotViolation" parameterType="com.medusa.mall.domain.vendor.VendorBotViolation" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_vendor_bot_violations
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="vendorId != null">vendor_id,</if>
+            <if test="orderId != null">order_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="messageId != null">message_id,</if>
+            <if test="violationType != null">violation_type,</if>
+            <if test="matchedKeyword != null">matched_keyword,</if>
+            <if test="messageContent != null">message_content,</if>
+            <if test="penaltyAmount != null">penalty_amount,</if>
+            <if test="penaltyStatus != null">penalty_status,</if>
+            <if test="processNotes != null">process_notes,</if>
+            violation_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="vendorId != null">#{vendorId},</if>
+            <if test="orderId != null">#{orderId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="messageId != null">#{messageId},</if>
+            <if test="violationType != null">#{violationType},</if>
+            <if test="matchedKeyword != null">#{matchedKeyword},</if>
+            <if test="messageContent != null">#{messageContent},</if>
+            <if test="penaltyAmount != null">#{penaltyAmount},</if>
+            <if test="penaltyStatus != null">#{penaltyStatus},</if>
+            <if test="processNotes != null">#{processNotes},</if>
+            now()
+        </trim>
+    </insert>
+
+    <update id="updateVendorBotViolation" parameterType="com.medusa.mall.domain.vendor.VendorBotViolation">
+        update mall_vendor_bot_violations
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="vendorId != null">vendor_id = #{vendorId},</if>
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="messageId != null">message_id = #{messageId},</if>
+            <if test="violationType != null">violation_type = #{violationType},</if>
+            <if test="matchedKeyword != null">matched_keyword = #{matchedKeyword},</if>
+            <if test="messageContent != null">message_content = #{messageContent},</if>
+            <if test="penaltyAmount != null">penalty_amount = #{penaltyAmount},</if>
+            <if test="penaltyStatus != null">penalty_status = #{penaltyStatus},</if>
+            <if test="processedTime != null">processed_time = #{processedTime},</if>
+            <if test="processNotes != null">process_notes = #{processNotes},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateVendorBotViolationStatus">
+        update mall_vendor_bot_violations
+        set penalty_status = #{status},
+            processed_time = now()
+        where id = #{id}
+    </update>
+
+</mapper>

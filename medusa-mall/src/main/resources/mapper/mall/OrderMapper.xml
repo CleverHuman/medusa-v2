@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.OrderMapper">
+    <resultMap type="Order" id="OrderResult">
+        <result property="id"     column="id"     />
+        <result property="orderSn"     column="order_sn"     />
+        <result property="memberId"     column="member_id"    />
+        <result property="memberLevel"     column="member_level"    />
+        <result property="vendorId"     column="vendor_id"    />
+        <result property="totalAmount"     column="total_amount"    />
+        <result property="freightAmount"     column="freight_amount"    />
+        <result property="couponAmount"     column="coupon_amount"    />
+        <result property="discountAmount"     column="discount_amount"    />
+        <result property="couponId"     column="coupon_id"    />
+        <result property="status"         column="status"          />
+        <result property="sourceType"         column="source_type"          />
+        <result property="orderType"         column="order_type"          />
+        <result property="bondApplicationId"         column="bond_application_id"          />
+        <result property="bondApplicationNumber"         column="bond_application_number"          />
+        <result property="isdispute"         column="isdispute"          />
+        <result property="disputeTime"         column="dispute_time"          />
+        <result property="disputeReason"         column="dispute_reason"          />
+        <result property="disputeBy"         column="dispute_by"          />
+        <result property="closeTime"         column="close_time"          />
+        <result property="finishTime"         column="finish_time"          />
+        <result property="balanceAvailableDate" column="balance_available_date" />
+        <result property="isBalanceReleased" column="is_balance_released" />
+        <result property="createBy"       column="create_by"       />
+        <result property="createTime"     column="create_time"     />
+        <result property="updateBy"       column="update_by"       />
+        <result property="updateTime"     column="update_time"     />
+        <result property="remark"         column="remark"  />
+        <result property="customerComment" column="customer_comment" />
+    </resultMap>
+
+    <sql id="selectOrderVo">
+        select * from mall_order
+    </sql>
+
+    <select id="selectOrderList" parameterType="Order" resultMap="OrderResult">
+        select  * from mall_order
+        <where>
+            <if test="vendorId != null">
+                AND vendor_id = #{vendorId}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND create_time &gt;= #{params.beginTime}
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND create_time &lt;= #{params.endTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectOrderListById" parameterType="Long" resultMap="OrderResult">
+        <include refid="selectOrderVo"/>
+        WHERE member_id = #{memberId}
+    </select>
+
+    <select id="selectOrderListByIdPaged" resultMap="OrderResult">
+        select * from mall_order
+        where member_id = #{memberId}
+        order by create_time desc
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="selectOrderById" parameterType="String" resultMap="OrderResult">
+        <include refid="selectOrderVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertOrder" parameterType="Order">
+        insert into mall_order (
+            id,
+            order_sn,
+            member_id,
+            member_level,
+            vendor_id,
+            total_amount,
+            freight_amount,
+            coupon_amount,
+            discount_amount,
+            coupon_id,
+            status,
+            source_type,
+            <if test="orderType != null">order_type,</if>
+            <if test="bondApplicationId != null">bond_application_id,</if>
+            <if test="bondApplicationNumber != null">bond_application_number,</if>
+            close_time,
+            finish_time,
+            create_by,
+            create_time,
+            update_by,
+            update_time,
+            remark,
+            customer_comment
+        ) values (
+            #{id},
+            #{orderSn},
+            #{memberId},
+            #{memberLevel},
+            #{vendorId},
+            #{totalAmount},
+            #{freightAmount},
+            #{couponAmount},
+            #{discountAmount},
+            #{couponId},
+            #{status},
+            #{sourceType},
+            <if test="orderType != null">#{orderType},</if>
+            <if test="bondApplicationId != null">#{bondApplicationId},</if>
+            <if test="bondApplicationNumber != null">#{bondApplicationNumber},</if>
+            #{closeTime},
+            #{finishTime},
+            #{createBy},
+            #{createTime},
+            #{updateBy},
+            #{updateTime},
+            #{remark},
+            #{customerComment}
+        )
+    </insert>
+
+    <update id="updateOrder" parameterType="Order">
+        update mall_order
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="isdispute != null">isdispute = #{isdispute},</if>
+            <if test="disputeTime != null">dispute_time = #{disputeTime},</if>
+            <if test="disputeReason != null">dispute_reason = #{disputeReason},</if>
+            <if test="disputeBy != null">dispute_by = #{disputeBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="customerComment != null">customer_comment = #{customerComment},</if>
+            <if test="balanceAvailableDate != null">balance_available_date = #{balanceAvailableDate},</if>
+            <if test="isBalanceReleased != null">is_balance_released = #{isBalanceReleased},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteOrderByIds" parameterType="String">
+        delete from mall_order where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 检查订单号是否存在 -->
+    <select id="checkOrderIdExists" parameterType="String" resultType="int">
+        SELECT COUNT(1) FROM mall_order WHERE id = #{orderId}
+    </select>
+
+    <!-- 查询已发货但余额未释放且到期的订单 -->
+    <select id="selectExpiredBalanceOrders" resultMap="OrderResult">
+        SELECT * FROM mall_order
+        WHERE vendor_id IS NOT NULL
+          AND status IN ('2', '3')
+          AND is_balance_released = 0
+          AND balance_available_date IS NOT NULL
+          AND balance_available_date &lt;= NOW()
+        ORDER BY balance_available_date ASC
+    </select>
+</mapper>

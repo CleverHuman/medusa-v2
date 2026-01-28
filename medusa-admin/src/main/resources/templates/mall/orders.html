@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Orders (AUD) - Mall</title>
+    <!-- Noscript重定向机制 -->
+    <meta th:if="${redirectToLogin}" http-equiv="refresh" content="0;url=/mall/static/login" />
+    <style>
+        body {
+            background: #181818;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background: #111;
+            color: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+        .nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .nav a:hover {
+            background: #222;
+        }
+        .main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            color: #fff;
+        }
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #222;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            table-layout: fixed;
+        }
+        .orders-table th, .orders-table td {
+            padding: 1rem 0.75rem;
+            text-align: left;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .orders-table th {
+            background: #181818;
+            color: #fff;
+            font-weight: 600;
+            border-bottom: 2px solid #333;
+        }
+        .orders-table tr {
+            border-bottom: 1px solid #333;
+        }
+        .orders-table tr:last-child {
+            border-bottom: none;
+        }
+        .orders-table td {
+            color: #eee;
+            vertical-align: middle;
+        }
+        /* 设置列宽度 */
+        .orders-table th:nth-child(1), .orders-table td:nth-child(1) { width: 8%; } /* Order # */
+        .orders-table th:nth-child(2), .orders-table td:nth-child(2) { width: 8%; } /* Date */
+        .orders-table th:nth-child(3), .orders-table td:nth-child(3) { width: 15%; } /* Items */
+        .orders-table th:nth-child(4), .orders-table td:nth-child(4) { width: 7%; } /* Shipping Cost */
+        .orders-table th:nth-child(5), .orders-table td:nth-child(5) { width: 7%; } /* Total */
+        .orders-table th:nth-child(6), .orders-table td:nth-child(6) { width: 9%; } /* Payment Status */
+        .orders-table th:nth-child(7), .orders-table td:nth-child(7) { width: 8%; } /* Order Status */
+        .orders-table th:nth-child(8), .orders-table td:nth-child(8) { width: 12%; } /* Tracking Number */
+        .orders-table th:nth-child(9), .orders-table td:nth-child(9) { width: 16%; } /* Payment Link */
+        .orders-table th:nth-child(10), .orders-table td:nth-child(10) { width: 10%; } /* Dispute */
+        .orders-table .btn {
+            padding: 0.4rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .orders-table .btn-pay {
+            background: #ff9800;
+            color: #fff;
+        }
+        .orders-table .btn-pay:hover {
+            background: #e68900;
+        }
+        .orders-table .btn-dispute {
+            background: #ff5722;
+            color: #fff;
+        }
+        .orders-table .btn-dispute:hover {
+            background: #d84315;
+        }
+        .status-link {
+            color: #ff5722;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .status-link:hover {
+            color: #ff7043;
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            overflow: auto;
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #222;
+            margin: auto;
+            padding: 2rem;
+            border: 1px solid #444;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #444;
+        }
+        .modal-header h2 {
+            margin: 0;
+            color: #ff5722;
+            font-size: 1.5rem;
+        }
+        .modal-close {
+            color: #aaa;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            text-align: center;
+        }
+        .modal-close:hover {
+            color: #fff;
+        }
+        .modal-body {
+            color: #eee;
+            line-height: 1.6;
+        }
+        .rejection-reason {
+            background: #333;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        @media (max-width: 900px) {
+            .main { padding: 1rem 0.2rem; }
+            .orders-table th, .orders-table td { padding: 0.5rem 0.3rem; }
+            .orders-table .btn { padding: 0.3rem 0.8rem; font-size: 0.9rem; }
+        }
+        @media (max-width: 600px) {
+            .orders-table, .orders-table thead, .orders-table tbody, .orders-table th, .orders-table td, .orders-table tr {
+                display: block;
+            }
+            .orders-table tr { margin-bottom: 1rem; }
+            .orders-table th {
+                background: #222;
+                color: #ff9800;
+                border: none;
+                padding: 0.5rem 0.3rem;
+            }
+            .orders-table td {
+                border: none;
+                padding: 0.5rem 0.3rem;
+                position: relative;
+            }
+            .orders-table td:before {
+                content: attr(data-label);
+                font-weight: bold;
+                color: #ff9800;
+                display: block;
+                margin-bottom: 0.2rem;
+            }
+            /* 移动端取消固定宽度 */
+            .orders-table th:nth-child(1), .orders-table td:nth-child(1),
+            .orders-table th:nth-child(2), .orders-table td:nth-child(2),
+            .orders-table th:nth-child(3), .orders-table td:nth-child(3),
+            .orders-table th:nth-child(4), .orders-table td:nth-child(4),
+            .orders-table th:nth-child(5), .orders-table td:nth-child(5),
+            .orders-table th:nth-child(6), .orders-table td:nth-child(6),
+            .orders-table th:nth-child(7), .orders-table td:nth-child(7),
+            .orders-table th:nth-child(8), .orders-table td:nth-child(8),
+            .orders-table th:nth-child(9), .orders-table td:nth-child(9),
+            .orders-table th:nth-child(10), .orders-table td:nth-child(10) {
+                width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <!-- LOGO -->
+        <div class="logo">
+            <img th:src="@{${logoUrl}}" alt="LOGO" style="height:60px;">
+        </div>
+        <nav class="nav">
+            <a th:href="@{/mall/static/home}">HOME</a>
+            <a th:href="@{/mall/static/digital-products}">DIGITAL PRODUCT</a>
+            <a th:href="@{/mall/static/physical-products}">PHYSICAL PRODUCT</a>
+            <a th:href="@{/mall/static/orders}">ORDERS</a>
+            <a th:href="@{/mall/static/cart}">CART</a>
+            <a th:href="@{/mall/static/profile}">PROFILE</a>
+            <a th:if="${session.memberToken == null}" th:href="@{/mall/static/login}">LOGIN</a>
+            <a th:if="${session.memberToken != null}" th:href="@{/mall/static/logout}">LOGOUT</a>
+        </nav>
+    </header>
+    <main class="main">
+        <h1>Your Orders (AUD)</h1>
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Shipping Cost</th>
+                    <th>Total</th>
+                    <th>Payment Status</th>
+                    <th>Order Status</th>
+                    <th>Tracking Number</th>
+                    <th>Payment Link</th>
+                    <th>Dispute</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="order : ${orders}">
+                    <td data-label="Order #" th:text="${order.orderId}">4362</td>
+                    <td data-label="Date" th:text="${order.date}">15-01-2025</td>
+                    <td data-label="Items" th:text="${order.items}">Hawaiian - 10 × 1 $120.00</td>
+                    <td data-label="Shipping Cost" th:text="${order.shippingCost}">$17.00</td>
+                    <td data-label="Total" th:text="${order.total}">$137.00</td>
+                    <td data-label="Payment Status" th:text="${order.paymentStatus}">Awaiting</td>
+                    <td data-label="Order Status">
+                        <span th:if="${order.orderStatus != 'Cancelled'}" th:text="${order.orderStatus}">Pending</span>
+                        <span th:if="${order.orderStatus == 'Cancelled'}" 
+                              class="status-link" 
+                              th:data-order-id="${order.orderId}"
+                              th:data-rejection-reason="${order.rejectionReason != null ? order.rejectionReason : ''}"
+                              onclick="showRejectionReason(this)">
+                            Cancelled
+                        </span>
+                    </td>
+                    <td data-label="Tracking Number">
+                        <span th:if="${order.showTracking}" th:text="${order.trackingNumber}" style="color: #4caf50; font-weight: 500;">AU12345678</span>
+                        <span th:if="${!order.showTracking and order.trackingMessage != null}" th:text="${order.trackingMessage}" style="color: #ff9800; font-size: 0.9rem;">Available after 20-01-2025</span>
+                        <span th:if="${!order.showTracking and order.trackingMessage == null}">-</span>
+                    </td>
+                    <td data-label="Payment Link">
+                        <a th:if="${order.paymentStatus == 'Awaiting'}" th:href="${order.paymentLink}" class="btn btn-pay">Pay this order</a>
+                        <span th:if="${order.paymentStatus != 'Awaiting'}" th:text="${order.paymentLink}">Order paid</span>
+                    </td>
+                    <td data-label="Dispute">
+                        <a th:if="${!order.isDisputed}" th:href="${order.disputeLink}" class="btn btn-dispute">Dispute</a>
+                        <span th:if="${order.isDisputed}" style="color: #ff5722; font-weight: 500;">Disputed</span>
+                    </td>
+                </tr>
+                <tr th:if="${orders == null or #lists.isEmpty(orders)}">
+                    <td colspan="10" style="text-align:center; color:#ff9800;">No orders found.</td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- 分页控件 -->
+        <div style="margin: 2rem 0; text-align: center;">
+            <div th:if="${totalPages > 1}">
+                <a th:if="${pageNum > 1}" th:href="@{'/mall/static/orders'(pageNum=${pageNum-1},pageSize=${pageSize})}" style="margin-right: 1rem; color: #ff9800; text-decoration: underline;">&laquo; Prev</a>
+                <span style="margin: 0 1rem; color: #fff;">Page <span th:text="${pageNum}">1</span> of <span th:text="${totalPages}">1</span></span>
+                <a th:if="${pageNum < totalPages}" th:href="@{'/mall/static/orders'(pageNum=${pageNum+1},pageSize=${pageSize})}" style="margin-left: 1rem; color: #ff9800; text-decoration: underline;">Next &raquo;</a>
+            </div>
+        </div>
+        
+        <!-- Tracking Number Security Notice -->
+        <div style="margin: 3rem 0 2rem 0; padding: 1.5rem; background: #222; border-radius: 8px; border-left: 4px solid #ff9800;">
+            <h2 style="color: #ff9800; font-size: 1.2rem; margin-bottom: 1rem; margin-top: 0;">Tracking Number Security Notice</h2>
+            <p style="color: #eee; line-height: 1.6; margin-bottom: 1rem;">
+                For security reasons, your tracking number will have extra random numbers added to the front and end.
+            </p>
+            <p style="color: #eee; line-height: 1.6; margin-bottom: 1.5rem;">
+                To find your real tracking number, look for the long number in the middle. It's the only part that is all numbers and longer than the others.
+            </p>
+            <div style="background: #181818; padding: 1rem; border-radius: 4px; margin-top: 1rem;">
+                <p style="color: #fff; margin: 0.5rem 0; font-weight: 500;">Example:</p>
+                <p style="color: #ccc; margin: 0.5rem 0;">
+                    <span style="color: #888;">Full code:</span><br>
+                    <code style="background: #111; padding: 0.3rem 0.5rem; border-radius: 3px; font-size: 0.9rem; color: #4caf50;">e019931265099999891<strong style="color: #4caf50; font-weight: bold;">0208067321268006060999</strong>8008240427111026</code>
+                </p>
+                <p style="color: #ccc; margin: 0.5rem 0;">
+                    <span style="color: #888;">Real tracking number:</span><br>
+                    <span style="font-size: 1.2rem;">➡️</span> 
+                    <code style="background: #111; padding: 0.3rem 0.5rem; border-radius: 3px; font-size: 0.9rem; color: #4caf50; font-weight: bold;">0208067321268006060999</code>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Rejection Reason Modal -->
+    <div id="rejectionModal" class="modal" onclick="closeRejectionModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Order Rejection Reason</h2>
+                <button class="modal-close" onclick="closeRejectionModal(event)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>This order was rejected by the vendor.</p>
+                <div id="rejectionReasonContent" class="rejection-reason">
+                    <!-- Rejection reason will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showRejectionReason(element) {
+            const rejectionReason = element.getAttribute('data-rejection-reason');
+            const orderId = element.getAttribute('data-order-id');
+            const modal = document.getElementById('rejectionModal');
+            const contentDiv = document.getElementById('rejectionReasonContent');
+            
+            if (rejectionReason && rejectionReason.trim() !== '') {
+                contentDiv.textContent = rejectionReason;
+            } else {
+                contentDiv.textContent = 'No specific reason provided by the vendor.';
+            }
+            
+            modal.classList.add('active');
+        }
+        
+        function closeRejectionModal(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            const modal = document.getElementById('rejectionModal');
+            modal.classList.remove('active');
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('rejectionModal');
+            if (event.target === modal) {
+                closeRejectionModal();
+            }
+        }
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeRejectionModal();
+            }
+        });
+    </script>
+
+    <!-- FOOTER -->
+    <footer style="background:#222;color:#fff;padding:2rem 0;margin-top:2rem;">
+        <div style="max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+                <img th:src="@{${footerLogo}}" alt="Footer Logo" style="height:60px;">
+            </div>
+            <div>
+                <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                    <li th:each="link : ${footerLinks}">
+                        <a th:href="${link.url}" th:text="${link.name}" style="color:#fff;text-decoration:none;font-size:14px;line-height:1.5;"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 

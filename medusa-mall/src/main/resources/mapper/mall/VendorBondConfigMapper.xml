@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.VendorBondConfigMapper">
+    
+    <resultMap type="VendorBondConfig" id="VendorBondConfigResult">
+        <result property="id" column="id" />
+        <result property="level" column="level" />
+        <result property="bondAmount" column="bond_amount" />
+        <result property="accountLifeDays" column="account_life_days" />
+        <result property="cumulativeTradeVolume" column="cumulative_trade_volume" />
+        <result property="tradeCapMultiplier" column="trade_cap_multiplier" />
+        <result property="totalTradeCapFormula" column="total_trade_cap_formula" />
+        <result property="liquidationPayout" column="liquidation_payout" />
+        <result property="payoutTime" column="payout_time" />
+        <result property="taxDiscountMultiplier" column="tax_discount_multiplier" />
+        <result property="amBonusDescription" column="am_bonus_description" />
+        <result property="levelPerks" column="level_perks" />
+        <result property="rulesContent" column="rules_content" />
+        <result property="status" column="status" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <sql id="selectVendorBondConfigVo">
+        select id, level, bond_amount, account_life_days, cumulative_trade_volume, 
+               trade_cap_multiplier, total_trade_cap_formula, liquidation_payout, 
+               payout_time, tax_discount_multiplier, am_bonus_description, 
+               level_perks, rules_content, status, 
+               create_by, create_time, update_by, update_time, remark
+        from mall_vendor_bond_config
+    </sql>
+
+    <select id="selectVendorBondConfigList" parameterType="VendorBondConfig" resultMap="VendorBondConfigResult">
+        <include refid="selectVendorBondConfigVo"/>
+        <where>  
+            <if test="level != null">and level = #{level}</if>
+            <if test="bondAmount != null">and bond_amount = #{bondAmount}</if>
+            <if test="status != null">and status = #{status}</if>
+        </where>
+        order by level asc
+    </select>
+    
+    <select id="selectVendorBondConfigById" parameterType="Long" resultMap="VendorBondConfigResult">
+        <include refid="selectVendorBondConfigVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectVendorBondConfigByLevel" parameterType="Integer" resultMap="VendorBondConfigResult">
+        <include refid="selectVendorBondConfigVo"/>
+        where level = #{level} and status = 1
+    </select>
+
+    <select id="selectActiveConfigs" resultMap="VendorBondConfigResult">
+        <include refid="selectVendorBondConfigVo"/>
+        where status = 1
+        order by level asc
+    </select>
+        
+    <insert id="insertVendorBondConfig" parameterType="VendorBondConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_vendor_bond_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="level != null">level,</if>
+            <if test="bondAmount != null">bond_amount,</if>
+            <if test="accountLifeDays != null">account_life_days,</if>
+            <if test="cumulativeTradeVolume != null">cumulative_trade_volume,</if>
+            <if test="tradeCapMultiplier != null">trade_cap_multiplier,</if>
+            <if test="totalTradeCapFormula != null">total_trade_cap_formula,</if>
+            <if test="liquidationPayout != null">liquidation_payout,</if>
+            <if test="payoutTime != null">payout_time,</if>
+            <if test="taxDiscountMultiplier != null">tax_discount_multiplier,</if>
+            <if test="amBonusDescription != null">am_bonus_description,</if>
+            <if test="levelPerks != null">level_perks,</if>
+            <if test="rulesContent != null">rules_content,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="level != null">#{level},</if>
+            <if test="bondAmount != null">#{bondAmount},</if>
+            <if test="accountLifeDays != null">#{accountLifeDays},</if>
+            <if test="cumulativeTradeVolume != null">#{cumulativeTradeVolume},</if>
+            <if test="tradeCapMultiplier != null">#{tradeCapMultiplier},</if>
+            <if test="totalTradeCapFormula != null">#{totalTradeCapFormula},</if>
+            <if test="liquidationPayout != null">#{liquidationPayout},</if>
+            <if test="payoutTime != null">#{payoutTime},</if>
+            <if test="taxDiscountMultiplier != null">#{taxDiscountMultiplier},</if>
+            <if test="amBonusDescription != null">#{amBonusDescription},</if>
+            <if test="levelPerks != null">#{levelPerks},</if>
+            <if test="rulesContent != null">#{rulesContent},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate()
+         </trim>
+    </insert>
+
+    <update id="updateVendorBondConfig" parameterType="VendorBondConfig">
+        update mall_vendor_bond_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="level != null">level = #{level},</if>
+            <if test="bondAmount != null">bond_amount = #{bondAmount},</if>
+            <if test="accountLifeDays != null">account_life_days = #{accountLifeDays},</if>
+            <if test="cumulativeTradeVolume != null">cumulative_trade_volume = #{cumulativeTradeVolume},</if>
+            <if test="tradeCapMultiplier != null">trade_cap_multiplier = #{tradeCapMultiplier},</if>
+            <if test="totalTradeCapFormula != null">total_trade_cap_formula = #{totalTradeCapFormula},</if>
+            <if test="liquidationPayout != null">liquidation_payout = #{liquidationPayout},</if>
+            <if test="payoutTime != null">payout_time = #{payoutTime},</if>
+            <if test="taxDiscountMultiplier != null">tax_discount_multiplier = #{taxDiscountMultiplier},</if>
+            <if test="amBonusDescription != null">am_bonus_description = #{amBonusDescription},</if>
+            <if test="levelPerks != null">level_perks = #{levelPerks},</if>
+            <if test="rulesContent != null">rules_content = #{rulesContent},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteVendorBondConfigById" parameterType="Long">
+        delete from mall_vendor_bond_config where id = #{id}
+    </delete>
+
+    <delete id="deleteVendorBondConfigByIds" parameterType="Long">
+        delete from mall_vendor_bond_config where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.VendorBotMapper">
+    
+    <resultMap type="com.medusa.mall.domain.vendor.VendorBot" id="VendorBotResult">
+        <result property="id" column="id" />
+        <result property="vendorId" column="vendor_id" />
+        <result property="botToken" column="bot_token" />
+        <result property="botUsername" column="bot_username" />
+        <result property="supportGroupId" column="support_group_id" />
+        <result property="status" column="status" />
+        <result property="penaltyAmount" column="penalty_amount" />
+        <result property="maxPenaltiesPerDay" column="max_penalties_per_day" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+        <result property="vendorName" column="vendor_name" />
+    </resultMap>
+
+    <sql id="selectVendorBotVo">
+        select vb.id, vb.vendor_id, vb.bot_token, vb.bot_username, vb.support_group_id,
+               vb.status, vb.penalty_amount, vb.max_penalties_per_day,
+               vb.create_time, vb.update_time,
+               v.vendor_name
+        from mall_vendor_bot vb
+        left join mall_vendor v on vb.vendor_id = v.id
+    </sql>
+
+    <select id="selectVendorBotList" parameterType="com.medusa.mall.domain.vendor.VendorBot" resultMap="VendorBotResult">
+        <include refid="selectVendorBotVo"/>
+        <where>
+            <if test="vendorId != null">and vb.vendor_id = #{vendorId}</if>
+            <if test="status != null">and vb.status = #{status}</if>
+        </where>
+        order by vb.create_time desc
+    </select>
+    
+    <select id="selectVendorBotById" parameterType="Long" resultMap="VendorBotResult">
+        <include refid="selectVendorBotVo"/>
+        where vb.id = #{id}
+    </select>
+
+    <select id="selectVendorBotByVendorId" parameterType="Long" resultMap="VendorBotResult">
+        <include refid="selectVendorBotVo"/>
+        where vb.vendor_id = #{vendorId}
+    </select>
+        
+    <insert id="insertVendorBot" parameterType="com.medusa.mall.domain.vendor.VendorBot" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_vendor_bot
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="vendorId != null">vendor_id,</if>
+            <if test="botToken != null">bot_token,</if>
+            <if test="botUsername != null">bot_username,</if>
+            <if test="supportGroupId != null">support_group_id,</if>
+            <if test="status != null">status,</if>
+            <if test="penaltyAmount != null">penalty_amount,</if>
+            <if test="maxPenaltiesPerDay != null">max_penalties_per_day,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+            create_time,
+            update_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="vendorId != null">#{vendorId},</if>
+            <if test="botToken != null">#{botToken},</if>
+            <if test="botUsername != null">#{botUsername},</if>
+            <if test="supportGroupId != null">#{supportGroupId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="penaltyAmount != null">#{penaltyAmount},</if>
+            <if test="maxPenaltiesPerDay != null">#{maxPenaltiesPerDay},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            now(),
+            now()
+        </trim>
+    </insert>
+
+    <update id="updateVendorBot" parameterType="com.medusa.mall.domain.vendor.VendorBot">
+        update mall_vendor_bot
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="vendorId != null">vendor_id = #{vendorId},</if>
+            <if test="botToken != null">bot_token = #{botToken},</if>
+            <if test="botUsername != null">bot_username = #{botUsername},</if>
+            <if test="supportGroupId != null">support_group_id = #{supportGroupId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="penaltyAmount != null">penalty_amount = #{penaltyAmount},</if>
+            <if test="maxPenaltiesPerDay != null">max_penalties_per_day = #{maxPenaltiesPerDay},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = now()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteVendorBotById" parameterType="Long">
+        delete from mall_vendor_bot where id = #{id}
+    </delete>
+
+</mapper>

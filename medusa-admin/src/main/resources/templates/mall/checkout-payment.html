@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Payment Method - Mall</title>
+    <style>
+        body {
+            background: #181818;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: #222;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            min-height: 600px;
+            color: #fff;
+            margin: 20px;
+        }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        .sidebar {
+            width: 300px;
+            background: #181818;
+            padding: 40px 30px;
+            border-left: 1px solid #333;
+            color: #fff;
+        }
+        .page-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .page-subtitle {
+            color: #bbb;
+            margin-bottom: 30px;
+        }
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #ff9800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .step-number.completed {
+            background: #6c757d;
+        }
+        .step-number.active {
+            background: #28a745;
+        }
+        .step-label {
+            font-weight: 500;
+            color: #fff;
+        }
+        .payment-methods {
+            margin-bottom: 2rem;
+        }
+        .payment-method {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
+            border: 2px solid #333;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #222;
+            color: #fff;
+        }
+        
+        .payment-method:hover {
+            border-color: #ff9800;
+            background: #2a2a2a;
+        }
+        
+        .payment-radio {
+            margin-right: 1rem;
+            transform: scale(1.2);
+            display: block !important;
+        }
+        
+        /* Custom radio button style */
+        .payment-method:has(.payment-radio:checked) {
+            border-color: #ff9800;
+            background: #2a2a2a;
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.3);
+        }
+        
+        /* Fallback for browsers that don't support :has() */
+        .payment-radio:checked + .payment-info {
+            color: #ff9800;
+        }
+        
+        .payment-radio:checked ~ .payment-icon {
+            color: #ff9800;
+        }
+        
+        .payment-info {
+            flex: 1;
+        }
+        
+        .payment-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+        
+        .payment-description {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        
+        .payment-icon {
+            font-size: 1.5rem;
+            margin-left: 1rem;
+            color: #ff9800;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #fff;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #181818;
+            color: #fff;
+            transition: border-color 0.3s ease;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #ff9800;
+        }
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-primary {
+            background: #ff9800;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #e68900;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .error-message {
+            background: #ff5722;
+            color: #fff;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border: 1px solid #d84315;
+        }
+        .success-message {
+            background: #28a745;
+            color: #fff;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border: 1px solid #218838;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            text-align: center;
+            width: 100%;
+        }
+        .button-group .btn {
+            margin: 0;
+            min-width: 120px;
+            flex-shrink: 0;
+        }
+        .order-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .summary-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .summary-row:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            font-size: 18px;
+            color: #333;
+            margin-top: 10px;
+            padding-top: 15px;
+            border-top: 2px solid #e9ecef;
+        }
+        .summary-label {
+            color: #666;
+        }
+        .summary-value {
+            font-weight: 600;
+            color: #333;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                flex-direction: column;
+                max-width: 100%;
+                margin: 10px;
+                min-height: auto;
+            }
+            .sidebar {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid #e9ecef;
+            }
+            .main-content {
+                padding: 30px 20px;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+</head>
+<body class="no-js">
+    <div class="container">
+        <div class="main-content">
+           
+            <!-- JavaScript Required Notice -->
+
+
+            <!-- Progress Bar -->
+
+
+            <!-- Page Title -->
+            <h1 class="page-title">Payment Method</h1>
+            <p class="page-subtitle">Choose your preferred payment method</p>
+
+            <!-- Error/Success Messages -->
+            <div th:if="${error}" class="error-message" th:text="${error}"></div>
+            <div th:if="${message}" class="success-message" th:text="${message}"></div>
+
+            <!-- Payment Methods -->
+            <form id="paymentForm" action="/mall/static/checkout/confirm" method="post">
+                <div class="payment-methods">
+                    <label class="payment-method" for="btc">
+                        <input type="radio" name="paymentMethod" value="btc" id="btc" class="payment-radio" required>
+                        <div class="payment-info">
+                            <div class="payment-name">Bitcoin (BTC)</div>
+                            <div class="payment-description">Pay with Bitcoin cryptocurrency</div>
+                        </div>
+                        <div class="payment-icon">₿</div>
+                    </label>
+
+                    <label class="payment-method" for="usdt">
+                        <input type="radio" name="paymentMethod" value="usdt" id="usdt" class="payment-radio">
+                        <div class="payment-info">
+                            <div class="payment-name">Tether (TRC20)</div>
+                            <div class="payment-description">Pay with USDT on TRON network</div>
+                        </div>
+                        <div class="payment-icon">₮</div>
+                    </label>
+
+                    <label class="payment-method" for="xmr">
+                        <input type="radio" name="paymentMethod" value="xmr" id="xmr" class="payment-radio">
+                        <div class="payment-info">
+                            <div class="payment-name">Monero (XMR)</div>
+                            <div class="payment-description">Pay with Monero cryptocurrency</div>
+                        </div>
+                        <div class="payment-icon">ɱ</div>
+                    </label>
+                </div>
+
+                <!-- Hidden fields to pass data from previous steps -->
+                <input type="hidden" name="shippingMethod" th:value="${shippingMethod}">
+                <input type="hidden" name="firstName" th:value="${firstName}">
+                <input type="hidden" name="lastName" th:value="${lastName}">
+                <input type="hidden" name="address1" th:value="${address1}">
+                <input type="hidden" name="address2" th:value="${address2}">
+                <input type="hidden" name="city" th:value="${city}">
+                <input type="hidden" name="state" th:value="${state}">
+                <input type="hidden" name="postalCode" th:value="${postalCode}">
+                <input type="hidden" name="country" th:value="${country}">
+                <input type="hidden" name="pgpKey" th:value="${pgpKey}">
+                <input type="hidden" name="pgpEmail" th:value="${pgpEmail}">
+
+                <!-- Action Buttons -->
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+
+       
+    </div>
+</body>
+</html> 

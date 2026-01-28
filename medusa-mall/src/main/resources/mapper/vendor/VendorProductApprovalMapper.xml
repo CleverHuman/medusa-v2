@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.VendorProductApprovalMapper">
+    <resultMap type="VendorProductApproval" id="VendorProductApprovalResult">
+        <result property="id" column="id" />
+        <result property="productId" column="product_id" />
+        <result property="vendorId" column="vendor_id" />
+        <result property="approvalStatus" column="approval_status" />
+        <result property="approvalNotes" column="approval_notes" />
+        <result property="approverId" column="approver_id" />
+        <result property="approverName" column="approver_name" />
+        <result property="approvedTime" column="approved_time" />
+        <result property="rejectionReason" column="rejection_reason" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="selectVendorProductApprovalVo">
+        select id, product_id, vendor_id, approval_status, approval_notes, approver_id, approver_name, approved_time, rejection_reason, create_time, update_time
+        from mall_vendor_product_approval
+    </sql>
+
+    <select id="selectByProductId" parameterType="Long" resultMap="VendorProductApprovalResult">
+        <include refid="selectVendorProductApprovalVo"/>
+        where product_id = #{productId}
+    </select>
+
+    <select id="selectByVendorId" parameterType="Long" resultMap="VendorProductApprovalResult">
+        <include refid="selectVendorProductApprovalVo"/>
+        where vendor_id = #{vendorId}
+        order by create_time desc
+    </select>
+
+    <select id="selectPendingApprovals" resultMap="VendorProductApprovalResult">
+        <include refid="selectVendorProductApprovalVo"/>
+        where approval_status = 'pending_approval'
+        order by create_time asc
+    </select>
+
+    <insert id="insertVendorProductApproval" parameterType="VendorProductApproval" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_vendor_product_approval
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productId != null">product_id,</if>
+            <if test="vendorId != null">vendor_id,</if>
+            <if test="approvalStatus != null">approval_status,</if>
+            <if test="approvalNotes != null">approval_notes,</if>
+            <if test="approverId != null">approver_id,</if>
+            <if test="approverName != null">approver_name,</if>
+            <if test="approvedTime != null">approved_time,</if>
+            <if test="rejectionReason != null">rejection_reason,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productId != null">#{productId},</if>
+            <if test="vendorId != null">#{vendorId},</if>
+            <if test="approvalStatus != null">#{approvalStatus},</if>
+            <if test="approvalNotes != null">#{approvalNotes},</if>
+            <if test="approverId != null">#{approverId},</if>
+            <if test="approverName != null">#{approverName},</if>
+            <if test="approvedTime != null">#{approvedTime},</if>
+            <if test="rejectionReason != null">#{rejectionReason},</if>
+        </trim>
+    </insert>
+
+    <update id="updateVendorProductApproval" parameterType="VendorProductApproval">
+        update mall_vendor_product_approval
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="approvalStatus != null">approval_status = #{approvalStatus},</if>
+            <if test="approvalNotes != null">approval_notes = #{approvalNotes},</if>
+            <if test="approverId != null">approver_id = #{approverId},</if>
+            <if test="approverName != null">approver_name = #{approverName},</if>
+            <if test="approvedTime != null">approved_time = #{approvedTime},</if>
+            <if test="rejectionReason != null">rejection_reason = #{rejectionReason},</if>
+        </trim>
+        where id = #{id}
+    </update>
+</mapper>
+

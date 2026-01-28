@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.MemberLoginInfoMapper">
+
+    <resultMap type="MemberLoginInfo" id="MemberLoginInfoResult">
+        <id property="infoId" column="info_id" />
+        <result property="memberId" column="member_id" />
+        <result property="sourceType" column="source_type" />
+        <result property="msg" column="msg" />
+        <result property="createTime"     column="create_time"     />
+    </resultMap>
+
+    <insert id="insertMemberLoginInfo" parameterType="MemberLoginInfo">
+        insert into mall_member_login_info (member_id, source_type, msg, create_time)
+        values (#{memberId}, #{sourceType}, #{msg}, sysdate())
+    </insert>
+
+    <select id="selectMemberLoginInfoList" parameterType="MemberLoginInfo" resultMap="MemberLoginInfoResult">
+        select info_id, member_id, source_type, msg, create_time from sys_logininfor
+        <where>
+            <if test="memberId != null and memberId != ''">
+                AND member_id = #{memberId}
+            </if>
+            <if test="sourceType != null and sourceType != ''">
+                AND source_type = #{sourceType}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND create_time &gt;= #{params.beginTime}
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND create_time &lt;= #{params.endTime}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <delete id="deleteMemberLoginInfoByIds" parameterType="Long">
+        delete from mall_member_login_info where info_id in
+        <foreach collection="array" item="infoId" open="(" separator="," close=")">
+            #{infoId}
+        </foreach>
+    </delete>
+
+    <update id="cleanLogininfor">
+        truncate table mall_member_login_info
+    </update>
+
+
+</mapper>

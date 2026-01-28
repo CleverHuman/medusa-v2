@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Application - VendorPortal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .step-indicator {
+            transition: all 0.3s ease;
+        }
+        .step-indicator.active {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+        }
+        .step-indicator.completed {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        .form-step {
+            display: none;
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        .form-step.active {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .input-field {
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1e40af, #1e3a8a);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #4b5563, #374151);
+            transform: translateY(-2px);
+        }
+        .validation-error {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .validation-success {
+            color: #10b981;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-gray-900">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md fixed w-full top-0 z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-amber-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">V</span>
+                    </div>
+                    <span class="text-xl font-bold text-gray-900">VendorPortal</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="saveDraft()" class="text-gray-600 hover:text-blue-600 transition-colors">
+                        Save Draft
+                    </button>
+                    <button onclick="window.location.href='index.html'" class="text-gray-600 hover:text-blue-600 transition-colors">
+                        Back to Home
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-16 min-h-screen">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <!-- Page Title -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Vendor Application</h1>
+                <p class="text-xl text-gray-600">Please complete the following information. We will review your application as soon as possible.</p>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div class="mb-12">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="step-indicator active w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm" data-step="1">1</div>
+                    <div class="flex-1 h-2 bg-gray-200 mx-4 rounded-full">
+                        <div class="progress-bar h-full rounded-full" style="width: 25%"></div>
+                    </div>
+                    <div class="step-indicator w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm bg-gray-200 text-gray-600" data-step="2">2</div>
+                    <div class="flex-1 h-2 bg-gray-200 mx-4 rounded-full"></div>
+                    <div class="step-indicator w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm bg-gray-200 text-gray-600" data-step="3">3</div>
+                    <div class="flex-1 h-2 bg-gray-200 mx-4 rounded-full"></div>
+                    <div class="step-indicator w-12 h-12 rounded-full flex items-center justify-center font-semibold text-sm bg-gray-200 text-gray-600" data-step="4">4</div>
+                </div>
+                <div class="flex justify-between text-sm text-gray-600">
+                    <span>Basic Information</span>
+                    <span>Product Details</span>
+                    <span>Contact Information</span>
+                    <span>Review & Submit</span>
+                </div>
+            </div>
+
+            <!-- Form Container -->
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <form id="applicationForm">
+                    <!-- Step 1: Basic Information -->
+                    <div class="form-step active" id="step1">
+                        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Basic Information</h2>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Vendor Name *</label>
+                                <input type="text" id="vendorName" name="vendorName" required 
+                                       class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <div class="validation-message" id="vendorName-validation"></div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Market Experience</label>
+                                <select id="hasMarketExperience" name="hasMarketExperience" 
+                                        class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        onchange="toggleMarketExperience()">
+                                    <option value="yes" selected>Yes</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="marketExperienceSection" class="mt-6">
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                                <div>
+                                    <h3 class="text-lg font-medium text-gray-900">Market History *</h3>
+                                    <p class="text-sm text-gray-500 mt-1">List the markets you have operated in and include the start and end year (multiple entries allowed).</p>
+                                </div>
+                                <button type="button" onclick="addMarketExperienceEntry()"
+                                        class="mt-3 md:mt-0 inline-flex items-center px-4 py-2 rounded-lg bg-blue-50 text-blue-600 font-semibold hover:bg-blue-100 transition-colors">
+                                    + Add Market
+                                </button>
+                            </div>
+                            <div id="marketExperienceEntries" class="space-y-4"></div>
+                            <input type="hidden" id="marketExperienceData" name="existingMarkets">
+                            <div class="validation-message" id="marketExperienceData-validation"></div>
+                            
+                            <div class="mt-6 grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Total Years of Experience</label>
+                                    <input type="number" id="experienceYears" name="experienceYears" min="0" 
+                                           class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                           placeholder="Total years of market experience (optional)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">PGP Public Key *</label>
+                            <textarea id="pgpSignature" name="pgpSignature" required rows="8"
+                                   class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                                   placeholder="-----BEGIN PGP PUBLIC KEY BLOCK-----&#10;&#10;mQINBF...&#10;&#10;-----END PGP PUBLIC KEY BLOCK-----"></textarea>
+                            <div class="validation-message" id="pgpSignature-validation"></div>
+                            <p class="text-sm text-gray-500 mt-1">Paste your complete PGP public key here. Used for identity verification and secure communication.</p>
+                        </div>
+
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Location (State) *</label>
+                            <select id="location" name="location" required 
+                                    class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">Select State</option>
+                                <option value="New South Wales">New South Wales (NSW)</option>
+                                <option value="Victoria">Victoria (VIC)</option>
+                                <option value="Queensland">Queensland (QLD)</option>
+                                <option value="South Australia">South Australia (SA)</option>
+                                <option value="Western Australia">Western Australia (WA)</option>
+                                <option value="Tasmania">Tasmania (TAS)</option>
+                                <option value="Australian Capital Territory">Australian Capital Territory (ACT)</option>
+                                <option value="Northern Territory">Northern Territory (NT)</option>
+                            </select>
+                            <div class="validation-message" id="location-validation"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Product Details -->
+                    <div class="form-step" id="step2">
+                        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Product Details</h2>
+                        
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-3">Product Categories * (Multiple Selection)</label>
+                            <div class="grid md:grid-cols-3 gap-3">
+                                <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" name="productCategories" value="Physical" class="mr-3">
+                                    <span>Physical</span>
+                                </label>
+                                <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" name="productCategories" value="Digital" class="mr-3">
+                                    <span>Digital</span>
+                                </label>
+                                <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="checkbox" name="productCategories" value="Service" class="mr-3">
+                                    <span>Service</span>
+                                </label>
+                            </div>
+                            <div class="validation-message" id="productCategories-validation"></div>
+                        </div>
+
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">IRL Experience</label>
+                            <select id="offlineDelivery" name="offlineDelivery" 
+                                    class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="no">No</option>
+                                <option value="yes">Yes</option>
+                            </select>
+                        </div>
+
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Product Description *</label>
+                            <textarea id="productDescription" name="productDescription" rows="4" required
+                                      class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">List out the products you are likely to sell.</textarea>
+                            <div class="validation-message" id="productDescription-validation"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Contact Information -->
+                    <div class="form-step" id="step3">
+                        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Contact Information</h2>
+                        
+                        <div class="mb-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Primary Contact * (Select at least one)</h3>
+                            <div class="space-y-4">
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="flex items-center mb-2">
+                                            <input type="checkbox" id="primaryTelegram" name="primaryContacts" value="telegram" class="mr-2">
+                                            <span class="font-medium">Telegram</span>
+                                        </label>
+                                        <input type="text" id="telegramId" name="telegramId" 
+                                               class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                               placeholder="@username" disabled>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="flex items-center mb-2">
+                                            <input type="checkbox" id="primarySignal" name="primaryContacts" value="signal" class="mr-2">
+                                            <span class="font-medium">Signal</span>
+                                        </label>
+                                        <input type="text" id="signalId" name="signalId" 
+                                               class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                               placeholder="Phone Number" disabled>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="flex items-center mb-2">
+                                            <input type="checkbox" id="primaryJabber" name="primaryContacts" value="jabber" class="mr-2">
+                                            <span class="font-medium">Jabber</span>
+                                        </label>
+                                        <input type="text" id="jabberId" name="jabberId" 
+                                               class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                               placeholder="username@domain.com" disabled>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="flex items-center mb-2">
+                                            <input type="checkbox" id="primaryEmail" name="primaryContacts" value="email" class="mr-2">
+                                            <span class="font-medium">Email</span>
+                                        </label>
+                                        <input type="email" id="emailAddress" name="emailAddress" 
+                                               class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                               placeholder="example@domain.com" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="validation-message" id="primaryContacts-validation"></div>
+                        </div>
+
+                        <div class="mb-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Secondary Contact (Select at least one)</h3>
+                            <div class="space-y-4">
+                                <div class="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="flex items-center mb-2">
+                                            <input type="checkbox" id="secondaryTelegram" name="secondaryContacts" value="telegram" class="mr-2">
+                                            <span class="font-medium">Telegram</span>
+                                        </label>
+                                        <input type="text" id="secondaryTelegramId" name="secondaryTelegramId" 
+                                               class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                               placeholder="@username" disabled>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="flex items-center mb-2">
+                                            <input type="checkbox" id="secondarySignal" name="secondaryContacts" value="signal" class="mr-2">
+                                            <span class="font-medium">Signal</span>
+                                        </label>
+                                        <input type="text" id="secondarySignalId" name="secondarySignalId" 
+                                               class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                               placeholder="Phone Number" disabled>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="flex items-center mb-2">
+                                            <input type="checkbox" id="secondaryJabber" name="secondaryContacts" value="jabber" class="mr-2">
+                                            <span class="font-medium">Jabber</span>
+                                        </label>
+                                        <input type="text" id="secondaryJabberId" name="secondaryJabberId" 
+                                               class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                               placeholder="username@domain.com" disabled>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="flex items-center mb-2">
+                                            <input type="checkbox" id="secondaryEmail" name="secondaryContacts" value="email" class="mr-2">
+                                            <span class="font-medium">Email</span>
+                                        </label>
+                                        <input type="email" id="secondaryEmailAddress" name="secondaryEmailAddress" 
+                                               class="input-field w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                               placeholder="example@domain.com" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="validation-message" id="secondaryContacts-validation"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Review & Submit -->
+                    <div class="form-step" id="step4">
+                        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Review Information</h2>
+                        
+                        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Application Summary</h3>
+                            <div id="applicationSummary" class="space-y-2 text-sm text-gray-600">
+                                <!-- Application summary will be generated dynamically by JavaScript -->
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-blue-800">Important Notice</h3>
+                                    <div class="mt-2 text-sm text-blue-700">
+                                        <p>Please review the information carefully. After submission, your application will enter the review process. You can track the progress using your application ID during the review period.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center mb-6">
+                            <input type="checkbox" id="agreeTerms" name="agreeTerms" required 
+                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="agreeTerms" class="ml-2 text-sm text-gray-700">
+                                I have read and agree to the <a href="#" class="text-blue-600 hover:text-blue-500">Terms of Service</a> and <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+                        <button type="button" id="prevBtn" onclick="changeStep(-1)" 
+                                class="btn-secondary text-white px-6 py-3 rounded-lg font-semibold" style="display: none;">
+                            Previous
+                        </button>
+                        <div class="flex-1"></div>
+                        <div class="flex space-x-4">
+                            <button type="button" id="nextBtn" onclick="changeStep(1)" 
+                                    class="btn-primary text-white px-6 py-3 rounded-lg font-semibold">
+                                Next
+                            </button>
+                            <button type="submit" id="submitBtn" 
+                                    class="btn-primary text-white px-8 py-3 rounded-lg font-semibold" style="display: none;">
+                                Submit Application
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl mx-4">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2 text-center">Application Submitted Successfully!</h3>
+            <p class="text-center text-gray-600 mb-4">
+                Application ID: <span id="applicationId" class="font-semibold text-blue-600 text-lg"></span>
+            </p>
+            
+            <!-- Status -->
+            <div class="bg-blue-50 rounded-lg p-4 mb-4 text-center">
+                <p class="text-sm font-semibold text-blue-700 mb-2">Status: <span id="applicationStatus" class="text-blue-600">Pending</span></p>
+            </div>
+            
+            <p class="text-sm text-gray-500 mb-6 text-center">We will complete the review within 3-5 business days. Please be patient.</p>
+            
+            <div class="flex space-x-4">
+                <button onclick="trackApplicationStatus()" class="btn-primary text-white px-6 py-2 rounded-lg font-semibold flex-1">
+                    Track Status
+                </button>
+                <button onclick="closeSuccessModal()" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-semibold flex-1">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="api-config.js"></script>
+    <script src="application.js"></script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.medusa.mall.mapper.ShopMapper">
+
+    <resultMap id="ShopResultMap" type="com.medusa.mall.domain.shop.Shop">
+        <id property="id" column="id"/>
+        <result property="shopName" column="shop_name"/>
+        <result property="shopCode" column="shop_code"/>
+        <result property="description" column="description"/>
+        <result property="storeId" column="store_id"/>
+        <result property="logoUrl" column="logo_url"/>
+        <result property="bannerUrl" column="banner_url"/>
+        <result property="contactEmail" column="contact_email"/>
+        <result property="contactPhone" column="contact_phone"/>
+        <result property="websiteUrl" column="website_url"/>
+        <result property="address" column="address"/>
+        <result property="currency" column="currency"/>
+        <result property="timezone" column="timezone"/>
+        <result property="status" column="status"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="isFeatured" column="is_featured"/>
+        <result property="metaTitle" column="meta_title"/>
+        <result property="metaDescription" column="meta_description"/>
+        <result property="metaKeywords" column="meta_keywords"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <!-- 根据ID查询商店 -->
+    <select id="selectShopById" parameterType="Long" resultMap="ShopResultMap">
+        SELECT * FROM mall_shop WHERE id = #{id}
+    </select>
+
+    <!-- 根据商店代码查询商店 -->
+    <select id="selectShopByCode" parameterType="String" resultMap="ShopResultMap">
+        SELECT * FROM mall_shop WHERE shop_code = #{shopCode}
+    </select>
+
+    <!-- 根据 store_id 查询商店 -->
+    <select id="selectShopByStoreId" parameterType="String" resultMap="ShopResultMap">
+        SELECT * FROM mall_shop WHERE store_id = #{storeId}
+    </select>
+
+    <!-- 查询商店列表 -->
+    <select id="selectShopList" parameterType="com.medusa.mall.domain.shop.Shop" resultMap="ShopResultMap">
+        SELECT * FROM mall_shop
+        <where>
+            <if test="shopName != null and shopName != ''">
+                AND shop_name LIKE CONCAT('%', #{shopName}, '%')
+            </if>
+            <if test="shopCode != null and shopCode != ''">
+                AND shop_code LIKE CONCAT('%', #{shopCode}, '%')
+            </if>
+            <if test="storeId != null and storeId != ''">
+                AND store_id LIKE CONCAT('%', #{storeId}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="currency != null and currency != ''">
+                AND currency = #{currency}
+            </if>
+        </where>
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+    <!-- 查询启用的商店列表 -->
+    <select id="selectEnabledShopList" resultMap="ShopResultMap">
+        SELECT * FROM mall_shop 
+        WHERE status = 1 
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+    <!-- 新增商店 -->
+    <insert id="insertShop" parameterType="com.medusa.mall.domain.shop.Shop" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO mall_shop (
+            shop_name, shop_code, description, store_id, logo_url, banner_url,
+            contact_email, contact_phone, website_url, address, currency, timezone,
+            status, sort_order, is_featured, meta_title, meta_description, meta_keywords,
+            create_by, create_time, update_by, update_time, remark
+        ) VALUES (
+            #{shopName}, #{shopCode}, #{description}, #{storeId}, #{logoUrl}, #{bannerUrl},
+            #{contactEmail}, #{contactPhone}, #{websiteUrl}, #{address}, #{currency}, #{timezone},
+            #{status}, #{sortOrder}, #{isFeatured}, #{metaTitle}, #{metaDescription}, #{metaKeywords},
+            #{createBy}, #{createTime}, #{updateBy}, #{updateTime}, #{remark}
+        )
+    </insert>
+
+    <!-- 修改商店 -->
+    <update id="updateShop" parameterType="com.medusa.mall.domain.shop.Shop">
+        UPDATE mall_shop
+        SET shop_name = #{shopName},
+            shop_code = #{shopCode},
+            description = #{description},
+            store_id = #{storeId},
+            logo_url = #{logoUrl},
+            banner_url = #{bannerUrl},
+            contact_email = #{contactEmail},
+            contact_phone = #{contactPhone},
+            website_url = #{websiteUrl},
+            address = #{address},
+            currency = #{currency},
+            timezone = #{timezone},
+            status = #{status},
+            sort_order = #{sortOrder},
+            is_featured = #{isFeatured},
+            meta_title = #{metaTitle},
+            meta_description = #{metaDescription},
+            meta_keywords = #{metaKeywords},
+            update_by = #{updateBy},
+            update_time = #{updateTime},
+            remark = #{remark}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除商店 -->
+    <delete id="deleteShopById" parameterType="Long">
+        DELETE FROM mall_shop WHERE id = #{id}
+    </delete>
+
+    <!-- 批量删除商店 -->
+    <delete id="deleteShopByIds" parameterType="Long[]">
+        DELETE FROM mall_shop WHERE id IN
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 检查商店代码是否存在 -->
+    <select id="checkShopCodeUnique" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM mall_shop WHERE shop_code = #{shopCode}
+    </select>
+
+    <!-- 检查 store_id 是否存在 -->
+    <select id="checkStoreIdUnique" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM mall_shop WHERE store_id = #{storeId}
+    </select>
+
+</mapper> 

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.VendorSupportSessionMapper">
+    
+    <resultMap type="com.medusa.mall.domain.vendor.VendorSupportSession" id="VendorSupportSessionResult">
+        <result property="id" column="id" />
+        <result property="vendorId" column="vendor_id" />
+        <result property="orderId" column="order_id" />
+        <result property="userId" column="user_id" />
+        <result property="topicId" column="topic_id" />
+        <result property="status" column="status" />
+        <result property="startTime" column="start_time" />
+        <result property="closeTime" column="close_time" />
+        <result property="lastMessageTime" column="last_message_time" />
+        <result property="messageCount" column="message_count" />
+    </resultMap>
+
+    <sql id="selectVendorSupportSessionVo">
+        select id, vendor_id, order_id, user_id, topic_id, status,
+               start_time, close_time, last_message_time, message_count
+        from mall_vendor_support_session
+    </sql>
+
+    <select id="selectVendorSupportSessionList" parameterType="com.medusa.mall.domain.vendor.VendorSupportSession" resultMap="VendorSupportSessionResult">
+        <include refid="selectVendorSupportSessionVo"/>
+        <where>
+            <if test="vendorId != null">and vendor_id = #{vendorId}</if>
+            <if test="orderId != null and orderId != ''">and order_id = #{orderId}</if>
+            <if test="userId != null">and user_id = #{userId}</if>
+            <if test="status != null and status != ''">and status = #{status}</if>
+        </where>
+        order by start_time desc
+    </select>
+    
+    <select id="selectVendorSupportSessionById" parameterType="Long" resultMap="VendorSupportSessionResult">
+        <include refid="selectVendorSupportSessionVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectActiveSession" parameterType="com.medusa.mall.domain.vendor.VendorSupportSession" resultMap="VendorSupportSessionResult">
+        <include refid="selectVendorSupportSessionVo"/>
+        <where>
+            <if test="vendorId != null">and vendor_id = #{vendorId}</if>
+            <if test="orderId != null and orderId != ''">and order_id = #{orderId}</if>
+            <if test="userId != null">and user_id = #{userId}</if>
+            and status = 'active'
+        </where>
+        limit 1
+    </select>
+
+    <select id="selectVendorSupportSessionByTopicId" resultMap="VendorSupportSessionResult">
+        <include refid="selectVendorSupportSessionVo"/>
+        where vendor_id = #{vendorId} and topic_id = #{topicId}
+        limit 1
+    </select>
+        
+    <insert id="insertVendorSupportSession" parameterType="com.medusa.mall.domain.vendor.VendorSupportSession" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_vendor_support_session
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="vendorId != null">vendor_id,</if>
+            <if test="orderId != null">order_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="topicId != null">topic_id,</if>
+            <if test="status != null">status,</if>
+            <if test="messageCount != null">message_count,</if>
+            start_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="vendorId != null">#{vendorId},</if>
+            <if test="orderId != null">#{orderId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="topicId != null">#{topicId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="messageCount != null">#{messageCount},</if>
+            now()
+        </trim>
+    </insert>
+
+    <update id="updateVendorSupportSession" parameterType="com.medusa.mall.domain.vendor.VendorSupportSession">
+        update mall_vendor_support_session
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="vendorId != null">vendor_id = #{vendorId},</if>
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="topicId != null">topic_id = #{topicId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="closeTime != null">close_time = #{closeTime},</if>
+            <if test="lastMessageTime != null">last_message_time = #{lastMessageTime},</if>
+            <if test="messageCount != null">message_count = #{messageCount},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateLastMessageTime" parameterType="Long">
+        update mall_vendor_support_session
+        set last_message_time = now(),
+            message_count = message_count + 1
+        where id = #{id}
+    </update>
+
+    <update id="closeSession">
+        update mall_vendor_support_session
+        set status = 'closed',
+            close_time = now()
+        where vendor_id = #{vendorId} and topic_id = #{topicId}
+    </update>
+
+</mapper>

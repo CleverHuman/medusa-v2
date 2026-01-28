@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Status Tracking - VendorPortal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .status-card {
+            transition: all 0.3s ease;
+        }
+        .status-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+        }
+        .timeline-item {
+            position: relative;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 40px;
+            bottom: -20px;
+            width: 2px;
+            background: #e5e7eb;
+        }
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        .timeline-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+        .timeline-dot.completed {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        .timeline-dot.active {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        .timeline-dot.pending {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .search-input {
+            transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-gray-900">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md fixed w-full top-0 z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-amber-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">V</span>
+                    </div>
+                    <span class="text-xl font-bold text-gray-900">VendorPortal</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="window.location.href='index.html'" class="text-gray-600 hover:text-blue-600 transition-colors">
+                        Back to Home
+                    </button>
+                    <button onclick="window.location.href='application.html'" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        New Application
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-16 min-h-screen">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <!-- Page Title -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Application Status Tracking</h1>
+                <p class="text-xl text-gray-600">Real-time tracking of your vendor application processing progress</p>
+            </div>
+
+            <!-- Search Section -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-6">Find Application</h2>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Application ID</label>
+                        <input type="text" id="applicationId" placeholder="Enter Application ID, e.g.: VENDOR-123456-ABC123" 
+                               class="search-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="searchApplication()" 
+                                class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                            Search Application
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-4 text-sm text-gray-500">
+                    Tip: Application ID can be found in the confirmation page when submitting your application
+                </div>
+            </div>
+
+            <!-- Application Details Section -->
+            <div id="applicationDetails" class="hidden">
+                <!-- Application Info Card -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h2 class="text-2xl font-semibold text-gray-900 mb-2">Application Details</h2>
+                            <p class="text-gray-600">Application ID: <span id="detailApplicationId" class="font-semibold text-blue-600"></span></p>
+                        </div>
+                        <div id="currentStatus" class="px-4 py-2 rounded-full text-sm font-semibold"></div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+                            <div class="space-y-3">
+                                <div><span class="text-gray-600">Vendor Name:</span><span id="vendorNameDetail" class="font-medium"></span></div>
+                                <div><span class="text-gray-600">Location:</span><span id="locationDetail" class="font-medium"></span></div>
+                                <div><span class="text-gray-600">Product Categories:</span><span id="productCategoriesDetail" class="font-medium"></span></div>
+                                <div><span class="text-gray-600">Application Date:</span><span id="applicationDate" class="font-medium"></span></div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Processing Statistics</h3>
+                            <div class="space-y-3">
+                                <div><span class="text-gray-600">Queue Position:</span><span id="queuePosition" class="font-medium text-blue-600"></span></div>
+                                <div><span class="text-gray-600">Estimated Processing Time:</span><span id="estimatedTime" class="font-medium"></span></div>
+                                <div><span class="text-gray-600">Reviewer:</span><span id="reviewer" class="font-medium"></span></div>
+                                <div><span class="text-gray-600">Last Update:</span><span id="lastUpdate" class="font-medium"></span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Processing Progress Timeline -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-6">Processing Progress</h2>
+                    <div id="timeline" class="space-y-6">
+                        <!-- Timeline items will be generated dynamically by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Interview Information -->
+                <div id="interviewSection" class="bg-white rounded-2xl shadow-lg p-8 mb-8 hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold text-gray-900">📅 Interview Schedule</h2>
+                        <div class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold">
+                            Interview Required
+                        </div>
+                    </div>
+
+                    <!-- Interview Cards Container -->
+                    <div id="interviewCards" class="space-y-4">
+                        <!-- Interview cards will be generated by JavaScript -->
+                    </div>
+
+                    <!-- No Interview Scheduled -->
+                    <div id="noInterview" class="hidden text-center py-8">
+                        <div class="text-gray-400 mb-4">
+                            <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">Interview Not Yet Scheduled</h3>
+                        <p class="text-gray-500">Our team will contact you shortly to arrange an interview time</p>
+                    </div>
+                </div>
+
+                <!-- Review Details -->
+                <div class="bg-white rounded-2xl shadow-lg p-8">
+                    <h2 class="text-2xl font-semibold text-gray-900 mb-6">Review Details</h2>
+                    <div id="reviewDetails" class="space-y-4">
+                        <!-- Review details will be generated dynamically by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sample Applications -->
+            <div id="sampleApplications" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="status-card bg-white rounded-2xl shadow-lg p-6 cursor-pointer" onclick="loadSampleApplication('VENDOR-284756-XZAB12')">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
+                            Approved
+                        </div>
+                        <div class="text-sm text-gray-500">3 days ago</div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Tech Electronics Ltd</h3>
+                    <p class="text-sm text-gray-600 mb-3">Application ID: VENDOR-284756-XZAB12</p>
+                    <div class="text-sm text-gray-500">
+                        <div>Categories: Electronics, Accessories</div>
+                        <div>Processing Time: 2 days</div>
+                    </div>
+                </div>
+
+                <div class="status-card bg-white rounded-2xl shadow-lg p-6 cursor-pointer" onclick="loadSampleApplication('VENDOR-392847-MNCD34')">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+                            Under Review
+                        </div>
+                        <div class="text-sm text-gray-500">1 day ago</div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Fashion Apparel Group</h3>
+                    <p class="text-sm text-gray-600 mb-3">Application ID: VENDOR-392847-MNCD34</p>
+                    <div class="text-sm text-gray-500">
+                        <div>Categories: Fashion Accessories</div>
+                        <div>Estimated Completion: 2 days</div>
+                    </div>
+                </div>
+
+                <div class="status-card bg-white rounded-2xl shadow-lg p-6 cursor-pointer" onclick="loadSampleApplication('VENDOR-156789-EFGH56')">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-semibold">
+                            Interview Required
+                        </div>
+                        <div class="text-sm text-gray-500">5 days ago</div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Beauty & Skincare Company</h3>
+                    <p class="text-sm text-gray-600 mb-3">Application ID: VENDOR-156789-EFGH56</p>
+                    <div class="text-sm text-gray-500">
+                        <div>Categories: Beauty & Personal Care</div>
+                        <div>Waiting for interview arrangement</div>
+                    </div>
+                </div>
+
+                <div class="status-card bg-white rounded-2xl shadow-lg p-6 cursor-pointer" onclick="loadSampleApplication('VENDOR-445678-IJKL78')">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
+                            Rejected
+                        </div>
+                        <div class="text-sm text-gray-500">1 week ago</div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Home Goods Supplier</h3>
+                    <p class="text-sm text-gray-600 mb-3">Application ID: VENDOR-445678-IJKL78</p>
+                    <div class="text-sm text-gray-500">
+                        <div>Categories: Home & Garden</div>
+                        <div>Reason: Qualification mismatch</div>
+                    </div>
+                </div>
+
+                <div class="status-card bg-white rounded-2xl shadow-lg p-6 cursor-pointer" onclick="loadSampleApplication('VENDOR-567890-MNOP90')">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-semibold">
+                            Pending
+                        </div>
+                        <div class="text-sm text-gray-500">2 days ago</div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Food & Beverage Company</h3>
+                    <p class="text-sm text-gray-600 mb-3">Application ID: VENDOR-567890-MNOP90</p>
+                    <div class="text-sm text-gray-500">
+                        <div>Categories: Food & Beverages</div>
+                        <div>Queue Position: #15</div>
+                    </div>
+                </div>
+
+                <div class="status-card bg-white rounded-2xl shadow-lg p-6 cursor-pointer" onclick="loadSampleApplication('VENDOR-678901-QRST12')">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold">
+                            Additional Info Required
+                        </div>
+                        <div class="text-sm text-gray-500">4 days ago</div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Sports Equipment Company</h3>
+                    <p class="text-sm text-gray-600 mb-3">Application ID: VENDOR-678901-QRST12</p>
+                    <div class="text-sm text-gray-500">
+                        <div>Categories: Sports & Outdoors</div>
+                        <div>Waiting for additional qualification documents</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <div class="flex items-center justify-center space-x-3 mb-4">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-amber-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">V</span>
+                    </div>
+                    <span class="text-xl font-bold">VendorPortal</span>
+                </div>
+                <p class="text-gray-400 mb-4">Professional Vendor Application & Onboarding Process Management System</p>
+                <p class="text-gray-500 text-sm">© 2024 VendorPortal. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="api-config.js"></script>
+    <script src="status.js"></script>
+</body>
+</html>

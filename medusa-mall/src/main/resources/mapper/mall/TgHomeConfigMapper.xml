@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.TgHomeConfigMapper">
+    <resultMap id="TgHomeConfigResultMap" type="com.medusa.mall.domain.TgHomeConfig">
+        <id property="id" column="id" />
+        <result property="bannerImage" column="banner_image" />
+        <result property="title" column="title" />
+        <result property="description" column="description" />
+        <result property="buttons" column="buttons" typeHandler="com.medusa.mall.mapper.handler.JsonTypeHandler" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <select id="selectConfig" resultMap="TgHomeConfigResultMap">
+        SELECT * FROM tg_home_config LIMIT 1
+    </select>
+
+    <insert id="insertConfig" parameterType="com.medusa.mall.domain.TgHomeConfig">
+        INSERT INTO tg_home_config (banner_image, title, description, buttons, update_by, remark)
+        VALUES (#{bannerImage}, #{title}, #{description}, #{buttons, typeHandler=com.medusa.mall.mapper.handler.JsonTypeHandler}, #{updateBy}, #{remark})
+    </insert>
+
+    <update id="updateConfig" parameterType="com.medusa.mall.domain.TgHomeConfig">
+        UPDATE tg_home_config
+        SET banner_image = #{bannerImage}, 
+            title = #{title}, 
+            description = #{description}, 
+            buttons = #{buttons, typeHandler=com.medusa.mall.mapper.handler.JsonTypeHandler}, 
+            update_by = #{updateBy}, 
+            remark = #{remark},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+</mapper> 

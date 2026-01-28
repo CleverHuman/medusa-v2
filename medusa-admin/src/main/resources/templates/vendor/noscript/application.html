@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-op Member Application - Co-op Member Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="/css/noscript-vendor.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .main-content { padding-top: 5rem; min-height: 100vh; }
+    </style>
+</head>
+<body class="bg-slate-50 text-gray-900">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md fixed w-full top-0 z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-amber-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">V</span>
+                    </div>
+                    <span class="text-xl font-bold text-gray-900">Co-op Member Portal</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/mall/static/vendor/status" class="text-gray-600 hover:text-blue-600 transition-colors">Dashboard</a>
+                    <a href="/mall/static/vendor/application" class="text-blue-600 font-semibold">Application</a>
+                    <a href="/mall/static/vendor/products" class="text-gray-600 hover:text-blue-600 transition-colors">Products</a>
+                    <a href="/mall/static/vendor/orders" class="text-gray-600 hover:text-blue-600 transition-colors">Orders</a>
+                    <a href="/mall/static/vendor/bond-level" class="text-gray-600 hover:text-blue-600 transition-colors">Bond & Level</a>
+                    <a href="/mall/static/vendor/withdrawal" class="text-gray-600 hover:text-blue-600 transition-colors">Withdrawal</a>
+                    <div th:if="${isLoggedIn}" class="flex items-center space-x-3 border-l border-gray-300 pl-4 ml-4">
+                        <span class="text-sm text-gray-600">Logged in as:</span>
+                        <span class="text-sm font-semibold text-gray-900" th:text="${currentUsername}">username</span>
+                        <form method="post" th:action="@{/mall/static/vendor/logout}" class="inline">
+                            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold text-sm">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-20 min-h-screen">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <!-- Page Title -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">Become a Co-op Member (CM)</h1>
+                <p class="text-xl text-gray-600">Complete the form below to apply for Co-op Membership</p>
+            </div>
+
+            <!-- Error Message -->
+            <div th:if="${error}" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded">
+                <p class="text-sm text-red-700" th:text="${error}">Error message</p>
+            </div>
+
+            <!-- Success Message -->
+            <div th:if="${success}" class="bg-green-50 border-l-4 border-green-400 p-4 mb-6 rounded">
+                <p class="text-sm text-green-700" th:text="${success}">Success message</p>
+            </div>
+
+            <!-- Existing Application Notice -->
+            <div th:if="${existingApplication != null and existingApplication.status != 'draft'}" class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded">
+                <p class="text-sm text-blue-700">You already have an application submitted. Status: <span th:text="${existingApplication.status}"></span></p>
+                <a href="/mall/static/vendor/status" class="text-blue-600 underline mt-2 inline-block">View Application Status</a>
+            </div>
+
+            <!-- Application Form -->
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <form method="post" action="/mall/static/vendor/application/submit">
+                    <!-- Basic Information -->
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Basic Information</h2>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Co-op Member Name *</label>
+                                <input type="text" name="vendorName" required 
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       th:value="${existingApplication != null ? existingApplication.vendorName : ''}">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Market Experience</label>
+                                <select name="hasMarketExperience" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                                    <option value="1" th:selected="${existingApplication != null and existingApplication.hasMarketExperience == 1}">Yes</option>
+                                    <option value="0" th:selected="${existingApplication != null and existingApplication.hasMarketExperience == 0}">No</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Total Years of Experience (Optional)</label>
+                            <input type="number" name="experienceYears" min="0" 
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                                   th:value="${existingApplication != null ? existingApplication.experienceYears : ''}"
+                                   placeholder="Total years of market experience">
+                        </div>
+
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">PGP Public Key *</label>
+                            <textarea name="pgpSignatureUrl" required rows="8"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg font-mono text-sm"
+                                   placeholder="-----BEGIN PGP PUBLIC KEY BLOCK-----" th:text="${existingApplication != null ? existingApplication.pgpSignatureUrl : ''}"></textarea>
+                            <p class="text-sm text-gray-500 mt-1">Paste your complete PGP public key here.</p>
+                        </div>
+
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Location (State) *</label>
+                            <select name="location" required class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                                <option value="">Select a location</option>
+                                <option value="New South Wales" th:selected="${existingApplication != null and existingApplication.location == 'New South Wales'}">New South Wales (NSW)</option>
+                                <option value="Victoria" th:selected="${existingApplication != null and existingApplication.location == 'Victoria'}">Victoria (VIC)</option>
+                                <option value="Queensland" th:selected="${existingApplication != null and existingApplication.location == 'Queensland'}">Queensland (QLD)</option>
+                                <option value="South Australia" th:selected="${existingApplication != null and existingApplication.location == 'South Australia'}">South Australia (SA)</option>
+                                <option value="Western Australia" th:selected="${existingApplication != null and existingApplication.location == 'Western Australia'}">Western Australia (WA)</option>
+                                <option value="Tasmania" th:selected="${existingApplication != null and existingApplication.location == 'Tasmania'}">Tasmania (TAS)</option>
+                                <option value="Australian Capital Territory" th:selected="${existingApplication != null and existingApplication.location == 'Australian Capital Territory'}">Australian Capital Territory (ACT)</option>
+                                <option value="Northern Territory" th:selected="${existingApplication != null and existingApplication.location == 'Northern Territory'}">Northern Territory (NT)</option>
+                                <option value="Online Service" th:selected="${existingApplication != null and existingApplication.location == 'Online Service'}">Online Service</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="mb-8 border-t border-gray-200 pt-8">
+                        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Product Details</h2>
+                        
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-3">Product Categories * (Select at least one)</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="productCategories" value="Physical" class="mr-2">
+                                    <span>Physical</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="productCategories" value="Digital" class="mr-2">
+                                    <span>Digital</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="productCategories" value="Service" class="mr-2">
+                                    <span>Service</span>
+                                </label>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">Note: You can select multiple categories. The form will send them as comma-separated values.</p>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">IRL Experience (Offline Delivery)</label>
+                            <select name="offlineDelivery" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                                <option value="0" th:selected="${existingApplication != null and existingApplication.offlineDelivery == 0}">No</option>
+                                <option value="1" th:selected="${existingApplication != null and existingApplication.offlineDelivery == 1}">Yes</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Stock Volume *</label>
+                            <select name="stockVolume" required class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                                <option value="">Select stock volume</option>
+                                <option value="small" th:selected="${existingApplication != null and existingApplication.stockVolume == 'small'}">Small (&lt;100 units)</option>
+                                <option value="medium" th:selected="${existingApplication != null and existingApplication.stockVolume == 'medium'}">Medium (100-1,000 units)</option>
+                                <option value="large" th:selected="${existingApplication != null and existingApplication.stockVolume == 'large'}">Large (1,000-10,000 units)</option>
+                                <option value="xlarge" th:selected="${existingApplication != null and existingApplication.stockVolume == 'xlarge'}">XLarge (&gt;10,000 units)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Product Description *</label>
+                            <textarea name="productDescription" rows="4" required
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                                      placeholder="List out the products you are likely to sell." th:text="${existingApplication != null ? existingApplication.productDescription : ''}"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="mb-8 border-t border-gray-200 pt-8">
+                        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Contact Information</h2>
+                        
+                        <div class="mb-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Primary Contact * (Fill at least one)</h3>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Telegram</label>
+                                    <input type="text" name="primaryTelegram" 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                                           placeholder="@username"
+                                           th:value="${existingApplication != null ? existingApplication.primaryTelegram : ''}">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Signal</label>
+                                    <input type="text" name="primarySignal" 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                                           placeholder="Phone Number"
+                                           th:value="${existingApplication != null ? existingApplication.primarySignal : ''}">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Jabber</label>
+                                    <input type="text" name="primaryJabber" 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                                           placeholder="username@domain.com"
+                                           th:value="${existingApplication != null ? existingApplication.primaryJabber : ''}">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                    <input type="email" name="primaryEmail" 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                                           placeholder="example@domain.com"
+                                           th:value="${existingApplication != null ? existingApplication.primaryEmail : ''}">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Threema</label>
+                                    <input type="text" name="primaryThreema" 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                                           placeholder="Threema ID"
+                                           th:value="${existingApplication != null ? existingApplication.primaryThreema : ''}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Secondary Contact (Fill at least one)</h3>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Telegram</label>
+                                    <input type="text" name="secondaryTelegram" 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                                           placeholder="@username"
+                                           th:value="${existingApplication != null ? existingApplication.secondaryTelegram : ''}">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Signal</label>
+                                    <input type="text" name="secondarySignal" 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                                           placeholder="Phone Number"
+                                           th:value="${existingApplication != null ? existingApplication.secondarySignal : ''}">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Jabber</label>
+                                    <input type="text" name="secondaryJabber" 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                                           placeholder="username@domain.com"
+                                           th:value="${existingApplication != null ? existingApplication.secondaryJabber : ''}">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                    <input type="email" name="secondaryEmail" 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                                           placeholder="example@domain.com"
+                                           th:value="${existingApplication != null ? existingApplication.secondaryEmail : ''}">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Threema</label>
+                                    <input type="text" name="secondaryThreema" 
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                                           placeholder="Threema ID"
+                                           th:value="${existingApplication != null ? existingApplication.secondaryThreema : ''}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="border-t border-gray-200 pt-6">
+                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                            <p class="text-sm text-amber-800 font-semibold">
+                                ⚠ Co-op membership requires accountability, bonding, and adherence to collective rules.
+                            </p>
+                        </div>
+                        
+                        <div class="flex items-start mb-6">
+                            <input type="checkbox" name="agreeTerms" required 
+                                   class="mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded">
+                            <label class="ml-2 text-sm text-gray-700">
+                                I have read and agree to the Terms of Service. By submitting this application, I confirm that all information provided is accurate.
+                            </label>
+                        </div>
+
+                        <button type="submit" class="w-full bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-lg">
+                            Submit Application
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

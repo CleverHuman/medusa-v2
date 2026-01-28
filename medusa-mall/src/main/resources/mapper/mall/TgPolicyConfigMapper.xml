@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.TgPolicyConfigMapper">
+    <resultMap id="TgPolicyConfigResultMap" type="com.medusa.mall.domain.TgPolicyConfig">
+        <id property="id" column="id" />
+        <result property="privacyPolicy" column="privacy_policy" />
+        <result property="termsOfService" column="terms_of_service" />
+        <result property="refundPolicy" column="refund_policy" />
+        <result property="shippingPolicy" column="shipping_policy" />
+        <result property="contactInfo" column="contact_info" />
+        <result property="createTime" column="create_time" />
+        <result property="updateTime" column="update_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <select id="selectConfig" resultMap="TgPolicyConfigResultMap">
+        SELECT * FROM tg_policy_config LIMIT 1
+    </select>
+
+    <insert id="insertConfig" parameterType="com.medusa.mall.domain.TgPolicyConfig">
+        INSERT INTO tg_policy_config (privacy_policy, terms_of_service, refund_policy, shipping_policy, contact_info, update_by, remark)
+        VALUES (#{privacyPolicy}, #{termsOfService}, #{refundPolicy}, #{shippingPolicy}, #{contactInfo}, #{updateBy}, #{remark})
+    </insert>
+
+    <update id="updateConfig" parameterType="com.medusa.mall.domain.TgPolicyConfig">
+        UPDATE tg_policy_config
+        SET privacy_policy = #{privacyPolicy}, 
+            terms_of_service = #{termsOfService}, 
+            refund_policy = #{refundPolicy}, 
+            shipping_policy = #{shippingPolicy}, 
+            contact_info = #{contactInfo}, 
+            update_by = #{updateBy}, 
+            remark = #{remark},
+            update_time = NOW()
+        WHERE id = #{id}
+    </update>
+</mapper> 

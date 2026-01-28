@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Mall</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .signup-container {
+            background: #2d2d2d;
+            padding: 2rem 3rem;
+            border-radius: 8px;
+            width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            display: flex;
+            justify-content: center;
+            color: white;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background: #FFFFFF;
+            border: 1px solid #444;
+            color: #000000;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00a8ff;
+            box-shadow: 0 0 0 2px rgba(0, 168, 255, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #504F4F;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 1rem;
+            transition: background 0.3s;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background: #636262;
+        }
+
+        button:disabled {
+            background: #3a3a3a;
+            cursor: not-allowed;
+        }
+
+        .login-link {
+            margin-top: 1.5rem;
+            text-align: center;
+            color: #888;
+        }
+
+        .login-link a {
+            color: #00a8ff;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #ff4d4f;
+            font-size: 0.8rem;
+            margin-top: -0.5rem;
+            margin-bottom: 0.5rem;
+            display: none;
+        }
+
+        .success-message {
+            color: #52c41a;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            display: none;
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        /* NoScript 样式 */
+        .noscript-message {
+            background: #ff4d4f;
+            color: white;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        /* 确保在noscript状态下错误信息可见 */
+        .error-message.noscript-visible {
+            display: block !important;
+            color: #ff4d4f;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding: 8px;
+            background: rgba(255, 77, 79, 0.1);
+            border-radius: 4px;
+            border-left: 3px solid #ff4d4f;
+        }
+        
+        /* 确保在noscript状态下成功信息可见 */
+        .success-message.noscript-visible {
+            display: block !important;
+            color: #52c41a;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            padding: 8px;
+            background: rgba(82, 196, 26, 0.1);
+            border-radius: 4px;
+            border-left: 3px solid #52c41a;
+        }
+        
+        /* JavaScript启用时的样式 */
+        .js-enabled .error-message:not(.noscript-visible) {
+            display: none;
+        }
+        
+        .js-enabled .success-message:not(.noscript-visible) {
+            display: none;
+        }
+        
+        .js-enabled .error-message.js-visible {
+            display: block;
+        }
+        
+        .js-enabled .success-message.js-visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <h2>Sign Up</h2>
+        
+        <!-- NoScript 提示 -->
+        <noscript>
+            <div class="noscript-message">
+                ⚠️ JavaScript is disabled. Some features may not work properly.
+            </div>
+        </noscript>
+        
+        <form method="POST" action="/mall/static/signup" id="signupForm">
+            <div class="form-group">
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Username"
+                    required
+                    th:value="${username}"
+                >
+            </div>
+            <div class="form-group">
+                <input
+                    type="text"
+                    name="primaryContact"
+                    placeholder="Primary Contact(Telegram or Email)"
+                    required
+                    th:value="${primaryContact}"
+                >
+            </div>
+            <div class="form-group">
+                <input
+                    type="text"
+                    name="secondaryContact"
+                    placeholder="Secondary Contact"
+                    th:value="${secondaryContact}"
+                >
+            </div>
+            <div class="form-group">
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    required
+                    minlength="6"
+                >
+            </div>
+            <div class="form-group">
+                <input
+                    type="password"
+                    name="confirmPassword"
+                    placeholder="Confirm Password"
+                    required
+                >
+            </div>
+
+            <button type="submit">
+                SIGN UP
+            </button>
+
+            <div class="login-link">
+                <span>Already have an account? </span>
+                <a href="/mall/static/login">Log In</a>
+            </div>
+        </form>
+        
+        <!-- 错误信息显示区域 -->
+        <div id="errorMessage" class="error-message" th:if="${error}" th:text="${error}" th:class="${error != null ? 'error-message noscript-visible' : 'error-message'}"></div>
+        
+        <!-- 成功信息显示区域 -->
+        <div id="successMessage" class="success-message" th:if="${message}" th:text="${message}" th:class="${message != null ? 'success-message noscript-visible' : 'success-message'}"></div>
+    </div>
+
+</body>
+</html> 

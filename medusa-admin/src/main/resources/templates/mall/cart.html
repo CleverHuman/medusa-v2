@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <!-- Noscript重定向机制 -->
+    <meta th:if="${redirectToLogin}" http-equiv="refresh" content="0;url=/mall/static/login" />
+    <style>
+        body {
+            background: #181818;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background: #111;
+            color: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+        .nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .nav a:hover {
+            background: #222;
+        }
+        .main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            padding-bottom: 100px; /* 为固定底部按钮留出空间 */
+        }
+        h1, h2 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            color: #fff;
+        }
+        .cart-container, .cart-summary {
+            background: #222;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            color: #fff;
+        }
+        .cart-header {
+            background: #181818;
+            padding: 1.5rem;
+            border-bottom: 1px solid #333;
+        }
+        .cart-header h2 {
+            margin: 0;
+            color: #fff;
+        }
+        .cart-items {
+            padding: 0;
+        }
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #333;
+        }
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        .item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 1rem;
+            background: #181818;
+        }
+        .item-details {
+            flex: 1;
+        }
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+        .item-sku, .item-model {
+            font-size: 0.9rem;
+            color: #bbb;
+            margin-bottom: 0.5rem;
+        }
+        .item-price {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ff9800;
+        }
+        .item-quantity {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0 2rem;
+        }
+        .quantity-btn {
+            background: #6c757d;
+            color: #fff;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .quantity-btn:hover {
+            background: #545b62;
+        }
+        .quantity-input {
+            width: 50px;
+            text-align: center;
+            padding: 0.5rem;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background: #181818;
+            color: #fff;
+        }
+        .item-total {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #28a745;
+            margin: 0 2rem;
+            min-width: 100px;
+            text-align: right;
+        }
+        .remove-btn {
+            background: #ff5722;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .remove-btn:hover {
+            background: #d84315;
+        }
+        .cart-summary {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            font-size: 1.1rem;
+        }
+        .cart-summary strong {
+            color: #ff9800;
+        }
+        .cart-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a1a;
+            padding: 1rem;
+            text-align: center;
+            border-top: 1px solid #333;
+            z-index: 1000;
+        }
+        
+        /* 为footer留出空间 */
+        .main {
+            padding-bottom: 120px;
+        }
+        .cart-actions .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            text-align: center;
+            font-weight: 500;
+            margin-right: 1rem;
+            transition: background 0.2s;
+        }
+        .btn-primary {
+            background: #ff9800;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #e68900;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .btn-success {
+            background: #28a745;
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .empty-cart {
+            text-align: center;
+            padding: 3rem;
+            color: #ff9800;
+        }
+        .empty-cart h3 {
+            margin-bottom: 1rem;
+        }
+        @media (max-width: 900px) {
+            .main { padding: 1rem 0.2rem 120px 0.2rem; }
+        }
+        @media (max-width: 600px) {
+            .cart-item { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .item-quantity { margin: 0; }
+            .item-total { margin: 0; text-align: left; }
+            .cart-actions { 
+                flex-direction: column; 
+                padding: 0.5rem;
+            }
+            .cart-actions .btn {
+                margin: 0.25rem 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <!-- LOGO -->
+        <div class="logo">
+            <img th:src="@{${logoUrl}}" alt="LOGO" style="height:60px;">
+        </div>
+        <nav class="nav">
+            <a th:href="@{/mall/static/home}">HOME</a>
+            <a th:href="@{/mall/static/digital-products}">DIGITAL PRODUCT</a>
+            <a th:href="@{/mall/static/physical-products}">PHYSICAL PRODUCT</a>
+            <a th:href="@{/mall/static/orders}">ORDERS</a>
+            <a th:href="@{/mall/static/cart}">CART</a>
+            <a th:href="@{/mall/static/profile}">PROFILE</a>
+            <a th:if="${session.memberToken == null}" th:href="@{/mall/static/login}">LOGIN</a>
+            <a th:if="${session.memberToken != null}" th:href="@{/mall/static/logout}">LOGOUT</a>
+        </nav>
+    </header>
+
+    <main class="main">
+        <!-- Success Message -->
+       <!-- <div th:if="${message}" class="success-message" th:text="${message}"></div> -->
+        
+        <!-- Error Message -->
+        <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+        <!-- Cart Container -->
+        <div class="cart-container" th:if="${cart != null and cart.detailedItems != null and !cart.detailedItems.empty}">
+            <div class="cart-header">
+                <h2>Shopping Cart</h2>
+                <!-- Guest Mode Notice -->
+                <div th:if="${isGuest}" style="background: #ff9800; color: #000; padding: 0.5rem 1rem; border-radius: 4px; margin-top: 1rem; font-size: 0.9rem;">
+                    <strong>Guest Mode:</strong> You're shopping as a guest. You can complete your order without registration.
+                </div>
+            </div>
+
+            <div class="cart-items">
+                <div class="cart-item" th:each="item : ${cart.detailedItems}">
+                    <img th:src="${item.imageUrl}" th:alt="${item.productName}" class="item-image">
+                    
+                    <div class="item-details">
+                        <div class="item-name" th:text="${item.productName}">Product Name</div>
+                        <div class="item-model" th:text="${item.formattedModel != null ? item.formattedModel : (item.model + (item.unit != null ? item.unit : ''))}">Model</div>
+                        <div class="item-price" th:text="${'$' + item.price}">Price</div>
+                    </div>
+
+                    <div class="item-quantity">
+                        <form method="post" action="/mall/static/cart/update" style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="hidden" name="productId" th:value="${item.productId}">
+                            <button type="submit" name="action" value="decrease" class="quantity-btn">-</button>
+                            <input type="number" name="quantity" class="quantity-input" th:value="${item.quantity}" min="1" style="width: 50px; text-align: center; padding: 0.5rem; border: 1px solid #333; border-radius: 4px; background: #181818; color: #fff;">
+                            <button type="submit" name="action" value="increase" class="quantity-btn">+</button>
+                        </form>
+                    </div>
+
+                    <div class="item-total" th:text="${'$' + item.totalPrice}">Total</div>
+
+                    <form method="post" action="/mall/static/cart/remove" style="display: inline;">
+                        <input type="hidden" name="productId" th:value="${item.productId}">
+                        <button type="submit" class="remove-btn">Remove</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="cart-summary">
+                <!-- Member Level Info -->
+                <div th:if="${!isGuest}" class="member-level-info" style="background: #333; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #ff9800; font-weight: bold;">Member Benefits:</span>
+                        <span th:if="${memberLevel != null}" th:text="${memberLevel}" style="color: #28a745; font-weight: bold;"></span>
+                    </div>
+                </div>
+                
+                <div class="summary-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span>Subtotal:</span>
+                    <span th:text="${cart.currency} + ' ' + ${cart.subtotal}">0.00</span>
+                </div>
+                <div class="summary-row" th:if="${cart.memberDiscount != null && cart.memberDiscount > 0}" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span>Member Discount:</span>
+                    <span style="color: #28a745; font-weight: bold;" th:text="${cart.currency} + ' -' + ${cart.memberDiscount}">0.00</span>
+                </div>
+                <div class="summary-row" th:if="${cart.couponDiscount != null && cart.couponDiscount > 0}" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span>Coupon Discount:</span>
+                    <span style="color: #28a745; font-weight: bold;" th:text="${cart.currency} + ' -' + ${cart.couponDiscount}">0.00</span>
+                </div>
+                <div class="summary-row" th:if="${session.applied_coupon_type != null && session.applied_coupon_type == 3}" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span>🚚 Free Shipping:</span>
+                    <span style="color: #28a745; font-weight: bold;" th:text="${cart.currency} + ' -0.00'">0.00</span>
+                </div>
+                <div class="summary-row total" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; font-weight: bold; font-size: 1.1rem;">
+                    <span>Total:</span>
+                    <span th:text="${cart.currency} + ' ' + ${cart.total}">0.00</span>
+                </div>
+            </div>
+
+            <!-- Coupon Code Input Area -->
+            <form method="get" action="/mall/static/cart" style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                <input type="text" name="couponCode" placeholder="Enter coupon code" style="flex:1; padding: 0.5rem; border-radius: 4px; border: 1px solid #333; background: #181818; color: #fff;" th:value="${param.couponCode}">
+                <button type="submit" class="btn btn-secondary" style="min-width: 120px;">Add Coupon</button>
+            </form>
+        </div>
+
+        <!-- Cart Actions - Fixed at Bottom -->
+        <div class="cart-actions" th:if="${cart != null and cart.detailedItems != null and !cart.detailedItems.empty}">
+                            <a th:href="@{/mall/static/products}" class="btn btn-secondary">Continue Shopping</a>
+                <a th:href="@{/mall/static/checkout}" class="btn btn-success">Proceed to Checkout</a>
+        </div>
+
+        <!-- Empty Cart Message -->
+        <div class="empty-cart" th:if="${cart == null or cart.detailedItems == null or cart.detailedItems.empty}">
+            <h3>Your cart is empty</h3>
+            <p>Looks like you haven't added any items to your cart yet.</p>
+            <a th:href="@{/mall/static/products}" class="btn btn-primary">Start Shopping</a>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer style="background:#222;color:#fff;padding:2rem 0;margin-top:2rem;">
+        <div style="max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;">
+            <div>
+                <img th:src="@{${footerLogo}}" alt="Footer Logo" style="height:60px;">
+            </div>
+            <div>
+                <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.5rem;">
+                    <li th:each="link : ${footerLinks}">
+                        <a th:href="${link.url}" th:text="${link.name}" style="color:#fff;text-decoration:none;font-size:14px;line-height:1.5;"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 

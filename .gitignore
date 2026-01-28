@@ -1,0 +1,27 @@
+# 忽略所有 .log 文件
+*.log
+
+# 忽略目录
+share/
+# 项目排除路径
+/meduds-admin/share/
+/medusa-admin/target/
+/medusa-common/target/
+/medusa-framework/target/
+/medusa-generator/target/
+/medusa-mall/target/
+/medusa-quartz/target/
+/medusa-system/target/
+/medusa-quartz/target/
+/medusa-generator/target/
+/.idea/
+/medusa-admin/src/main/resources/application.yml
+/medusa-admin-vue/run.sh
+/medusa-admin-vue/build_dist.sh
+
+/medusa-admin-vue/target/
+
+/docker/data/
+
+.DS_Store
+test-ssh-onion.sh

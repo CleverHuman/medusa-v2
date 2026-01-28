@@ -1,0 +1,93 @@
+name: Build & Deploy to Dev
+on:
+  pull_request:
+    types: [closed]
+    branches: [dev]
+
+jobs:
+  deploy:
+    runs-on: medusa_v2_dev
+    if: ${{ github.event.pull_request.merged == true}}
+    steps:
+      - name: Setup Git proxy for .onion only
+        run: |
+          # 只为 .onion 域名设置代理
+          git config --global http.http://*.onion.proxy socks5h://172.20.0.10:9050
+          git config --global https.https://*.onion.proxy socks5h://172.20.0.10:9050
+          git config --global http.sslVerify false
+          
+          # 确保其他流量不使用代理
+          git config --global --unset http.proxy || true
+          git config --global --unset https.proxy || true  
+
+      # 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # install Docker CLI docker compose
+      - name: Check Docker Tools
+        run: |
+          # verify
+          docker --version
+          docker compose version
+
+      # 安装 Java 21
+      - name: Setup Java21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Maven
+        uses: stCarolas/setup-maven@v4
+        with:
+          maven-version: 3.9.9
+
+
+      # 安装 Node.js 20
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 构建 Java 后端（Maven 下载不走代理）
+      - name: Build Java Backend
+        run: |         
+          java -version
+          mvn -v
+          
+          # 使用更快的 Maven 镜像
+          mvn clean package -DskipTests -f pom.xml     
+
+      # 停止应用
+      - name: Stop Compose
+        run: |
+          cd docker/compose
+          # 停止并删除现有容器
+          docker compose -f docker-compose.dev.yml --env-file .env.dev down
+
+      # 动态生成环境文件
+      - name: Generate .env.dev with Secrets
+        run: |
+          cd docker/compose
+          cat << EOF > .env.dev
+          $(cat .env.dev)
+          DB_ROOT_PASSWORD=${{ secrets.DEV_DB_ROOT_PASSWORD }}
+          DB_PASSWORD=${{ secrets.DEV_DB_PASSWORD }}
+          REDIS_PASSWORD=${{ secrets.DEV_REDIS_PASSWORD }}
+          
+          BTCPAY_URL =${{ secrets.DEV_BTCPAY_URL }}
+          BTCPAY_API_KEY=${{ secrets.DEV_BTCPAY_API_KEY }}
+          BTCPAY_STORE_ID=${{ secrets.DEV_BTCPAY_STORE_ID }}
+          NOWPAYMENTS_API_KEY=${{ secrets.DEV_NOWPAYMENTS_API_KEY }}
+          EOF
+
+      # 部署应用
+      - name: Deploy with Compose
+        run: |
+          cd docker/compose
+
+          # 启动新容器
+          docker compose -f docker-compose.dev.yml --env-file .env.dev up -d --build
+          # 验证部署
+          docker ps -a

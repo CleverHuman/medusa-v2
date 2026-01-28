@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.VendorWithdrawalAddressMapper">
+    
+    <resultMap type="com.medusa.mall.domain.vendor.VendorWithdrawalAddress" id="VendorWithdrawalAddressResult">
+        <id     property="id"       column="id"      />
+        <result property="vendorId" column="vendor_id" />
+        <result property="currency" column="currency" />
+        <result property="address" column="address" />
+        <result property="addressLabel" column="address_label" />
+        <result property="isActive" column="is_active" />
+        <result property="verifiedAt" column="verified_at" />
+        <result property="verifiedMethod" column="verified_method" />
+        <result property="verificationCode" column="verification_code" />
+        <result property="pendingAddress" column="pending_address" />
+        <result property="pendingVerificationCode" column="pending_verification_code" />
+        <result property="pendingRequestTime" column="pending_request_time" />
+        <result property="previousAddress" column="previous_address" />
+        <result property="withdrawalLockUntil" column="withdrawal_lock_until" />
+        <result property="addressChangedAt" column="address_changed_at" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <sql id="selectVendorWithdrawalAddressVo">
+        select id, vendor_id, currency, address, address_label, is_active,
+               verified_at, verified_method, verification_code,
+               pending_address, pending_verification_code, pending_request_time, previous_address,
+               withdrawal_lock_until, address_changed_at,
+               create_by, create_time, update_by, update_time, remark
+        from mall_vendor_withdrawal_address
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="VendorWithdrawalAddressResult">
+        <include refid="selectVendorWithdrawalAddressVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectByVendorId" parameterType="Long" resultMap="VendorWithdrawalAddressResult">
+        <include refid="selectVendorWithdrawalAddressVo"/>
+        where vendor_id = #{vendorId}
+        order by currency
+    </select>
+
+    <select id="selectByVendorIdAndCurrency" resultMap="VendorWithdrawalAddressResult">
+        <include refid="selectVendorWithdrawalAddressVo"/>
+        where vendor_id = #{vendorId} and currency = #{currency}
+    </select>
+
+    <insert id="insert" parameterType="com.medusa.mall.domain.vendor.VendorWithdrawalAddress" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_vendor_withdrawal_address
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="vendorId != null">vendor_id,</if>
+            <if test="currency != null and currency != ''">currency,</if>
+            <if test="address != null and address != ''">address,</if>
+            <if test="addressLabel != null">address_label,</if>
+            <if test="isActive != null">is_active,</if>
+            <if test="verifiedAt != null">verified_at,</if>
+            <if test="verifiedMethod != null">verified_method,</if>
+            <if test="verificationCode != null">verification_code,</if>
+            <if test="pendingAddress != null">pending_address,</if>
+            <if test="pendingVerificationCode != null">pending_verification_code,</if>
+            <if test="pendingRequestTime != null">pending_request_time,</if>
+            <if test="previousAddress != null">previous_address,</if>
+            <if test="withdrawalLockUntil != null">withdrawal_lock_until,</if>
+            <if test="addressChangedAt != null">address_changed_at,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="vendorId != null">#{vendorId},</if>
+            <if test="currency != null and currency != ''">#{currency},</if>
+            <if test="address != null and address != ''">#{address},</if>
+            <if test="addressLabel != null">#{addressLabel},</if>
+            <if test="isActive != null">#{isActive},</if>
+            <if test="verifiedAt != null">#{verifiedAt},</if>
+            <if test="verifiedMethod != null">#{verifiedMethod},</if>
+            <if test="verificationCode != null">#{verificationCode},</if>
+            <if test="pendingAddress != null">#{pendingAddress},</if>
+            <if test="pendingVerificationCode != null">#{pendingVerificationCode},</if>
+            <if test="pendingRequestTime != null">#{pendingRequestTime},</if>
+            <if test="previousAddress != null">#{previousAddress},</if>
+            <if test="withdrawalLockUntil != null">#{withdrawalLockUntil},</if>
+            <if test="addressChangedAt != null">#{addressChangedAt},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            NOW()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.medusa.mall.domain.vendor.VendorWithdrawalAddress">
+        update mall_vendor_withdrawal_address
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="address != null and address != ''">address = #{address},</if>
+            <if test="addressLabel != null">address_label = #{addressLabel},</if>
+            <if test="isActive != null">is_active = #{isActive},</if>
+            <if test="verifiedAt != null">verified_at = #{verifiedAt},</if>
+            <if test="verifiedMethod != null">verified_method = #{verifiedMethod},</if>
+            <if test="verificationCode != null">verification_code = #{verificationCode},</if>
+            <if test="pendingAddress != null">pending_address = #{pendingAddress},</if>
+            <if test="pendingVerificationCode != null">pending_verification_code = #{pendingVerificationCode},</if>
+            <if test="pendingRequestTime != null">pending_request_time = #{pendingRequestTime},</if>
+            <if test="previousAddress != null">previous_address = #{previousAddress},</if>
+            <if test="withdrawalLockUntil != null">withdrawal_lock_until = #{withdrawalLockUntil},</if>
+            <if test="addressChangedAt != null">address_changed_at = #{addressChangedAt},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = NOW()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="Long">
+        delete from mall_vendor_withdrawal_address where id = #{id}
+    </delete>
+
+</mapper>
+

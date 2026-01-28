@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.Product2Mapper">
+    
+    <resultMap type="Product2" id="Product2Result">
+        <result property="id"    column="id"    />
+        <result property="productId"    column="product_id"    />
+        <result property="sku"    column="sku"    />
+        <result property="model"    column="model"    />
+        <result property="unit"    column="unit"    />
+        <result property="price"    column="price"    />
+        <result property="currency"    column="currency"    />
+        <result property="inventory"    column="inventory"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectProduct2Vo">
+        select id, product_id, sku, model, unit, price, currency, inventory, status from mall_product2
+    </sql>
+
+    <select id="selectProduct2List" parameterType="Product2" resultMap="Product2Result">
+        <include refid="selectProduct2Vo"/>
+        <where>  
+            <if test="productId != null  and productId != ''"> and product_id = #{productId}</if>
+            <if test="sku != null  and sku != ''"> and sku = #{sku}</if>
+            <if test="model != null "> and model = #{model}</if>
+            <if test="price != null "> and price = #{price}</if>
+            <if test="currency != null  and currency != ''"> and currency = #{currency}</if>
+            <if test="inventory != null "> and inventory = #{inventory}</if>
+            <if test="status != null "> and status = #{status}</if>
+            and status != 2
+        </where>
+        order by id desc
+    </select>
+    
+    <select id="selectProduct2ById" parameterType="Long" resultMap="Product2Result">
+        <include refid="selectProduct2Vo"/>
+        where id = #{id} and status != 2
+    </select>
+        
+    <insert id="insertProduct2" parameterType="Product2" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_product2
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productId != null">product_id,</if>
+            <if test="sku != null">sku,</if>
+            <if test="model != null">model,</if>
+            <if test="unit != null">unit,</if>
+            <if test="price != null">price,</if>
+            <if test="currency != null">currency,</if>
+            <if test="inventory != null">inventory,</if>
+            <if test="status != null">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productId != null">#{productId},</if>
+            <if test="sku != null">#{sku},</if>
+            <if test="model != null">#{model},</if>
+            <if test="unit != null">#{unit},</if>
+            <if test="price != null">#{price},</if>
+            <if test="currency != null">#{currency},</if>
+            <if test="inventory != null">#{inventory},</if>
+            <if test="status != null">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updateProduct2" parameterType="Product2">
+        update mall_product2
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="sku != null">sku = #{sku},</if>
+            <if test="model != null">model = #{model},</if>
+            <if test="unit != null">unit = #{unit},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="currency != null">currency = #{currency},</if>
+            <if test="inventory != null">inventory = #{inventory},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteProduct2ById" parameterType="Long">
+        delete from mall_product2 where id = #{id}
+    </delete>
+
+    <delete id="deleteProduct2ByIds" parameterType="String">
+        delete from mall_product2 where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectAllCategories" resultType="String">
+        select distinct p.category from mall_product p 
+        inner join mall_product2 p2 on p.product_id = p2.product_id 
+        where p.status != 2 and p2.status != 2
+    </select>
+
+    <select id="selectProduct2ByCategory" parameterType="String" resultMap="Product2Result">
+        select p2.id, p2.product_id, p2.sku, p2.model, p2.unit, p2.price, p2.currency, p2.inventory, p2.status 
+        from mall_product2 p2
+        inner join mall_product p on p2.product_id = p.product_id
+        where p.category = #{category} and p.status != 2 and p2.status != 2
+    </select>
+
+    <select id="selectProduct2BySku" parameterType="String" resultMap="Product2Result">
+        <include refid="selectProduct2Vo"/>
+        where sku = #{sku} and status != 2
+    </select>
+
+    <select id="selectProduct2ByProductIdAndSpec" resultMap="Product2Result">
+        <include refid="selectProduct2Vo"/>
+        where product_id = #{productId} and model = #{productSpec} and status != 2
+    </select>
+
+    <select id="selectProduct2ByProductId" parameterType="String" resultMap="Product2Result">
+        <include refid="selectProduct2Vo"/>
+        where product_id = #{productId} and status != 2
+        order by id asc
+        limit 1
+    </select>
+
+</mapper> 

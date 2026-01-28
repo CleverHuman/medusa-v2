@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Error - Co-op Member</title>
+    <style>
+        body {
+            background: #181818;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .error-container {
+            background: #222;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            text-align: center;
+        }
+        .error-title {
+            font-size: 2rem;
+            color: #ff4444;
+            margin-bottom: 1rem;
+        }
+        .error-message {
+            color: #ccc;
+            margin-bottom: 2rem;
+        }
+        .back-btn {
+            padding: 1rem 2rem;
+            background: #ff9800;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .back-btn:hover {
+            background: #ff8800;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1 class="error-title">Payment Error</h1>
+        <p class="error-message" th:text="${error}">An error occurred while processing your payment.</p>
+        <a href="/vendor/status" class="back-btn">Back to Status Page</a>
+    </div>
+</body>
+</html>

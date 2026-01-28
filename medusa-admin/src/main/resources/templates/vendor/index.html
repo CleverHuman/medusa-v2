@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-op Member Portal Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg {
+            background: radial-gradient(circle at top, rgba(37, 99, 235, 0.15), transparent 60%), #0f172a;
+        }
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    <div class="max-w-6xl mx-auto px-6 py-16">
+        <header class="text-center space-y-4 mb-14">
+            <div class="inline-flex items-center space-x-3 bg-blue-500/20 border border-blue-400/40 rounded-full px-5 py-2 text-sm">
+                <span class="w-2 h-2 rounded-full bg-blue-300 animate-pulse"></span>
+                <span>Co-op Member Portal</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-semibold">Co-op Member Hub</h1>
+            <p class="text-lg text-blue-100 max-w-2xl mx-auto mb-4">
+                Bond-backed accountability, dispute resolution, and member governance — built to protect both buyers and members.
+            </p>
+            <div class="flex flex-wrap justify-center gap-3 mt-4">
+                <div class="inline-flex items-center gap-2 px-4 py-2 border border-white/20 rounded-lg bg-white/5 text-sm font-semibold">
+                    <span>🛡</span> Bond-backed protection
+                </div>
+                <div class="inline-flex items-center gap-2 px-4 py-2 border border-white/20 rounded-lg bg-white/5 text-sm font-semibold">
+                    <span>🗳</span> Governance & voting rights
+                </div>
+                <div class="inline-flex items-center gap-2 px-4 py-2 border border-white/20 rounded-lg bg-white/5 text-sm font-semibold">
+                    <span>📈</span> Reputation-based trade capacity
+                </div>
+            </div>
+        </header>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            <div class="card-hover bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-semibold">New to the Co-op?</h2>
+                    <span class="text-xs uppercase tracking-widest text-blue-300">NEW MEMBERS</span>
+                </div>
+                <p class="text-blue-100 mb-6 leading-relaxed">
+                    Create your CM account and submit a membership application. You'll be guided through bonding, eligibility checks, and any required interview steps. Your CM account is separate from standard customer accounts, scoped to your membership.
+                </p>
+                <div class="flex flex-col md:flex-row md:space-x-4 space-y-3 md:space-y-0">
+                    <a href="/mall/static/vendor/register" class="flex-1 text-center bg-blue-500 hover:bg-blue-600 transition-colors text-white py-3 rounded-xl font-medium">
+                        Apply for Co-op Membership
+                    </a>
+                    <a href="/mall/static/vendor/login" class="flex-1 text-center bg-white/10 hover:bg-white/20 transition-colors text-white py-3 rounded-xl font-medium border border-white/20">
+                        Member Login
+                    </a>
+                </div>
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 mt-4">
+                    <p class="text-sm text-amber-100 font-semibold leading-relaxed">
+                        ⚠ Co-op membership requires accountability, bonding, and adherence to collective rules. If you're looking for anonymous or low-commitment selling, this is not the right platform.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card-hover bg-white/5 border border-white/10 rounded-3xl p-8 backdrop-blur">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-semibold">Returning Members</h2>
+                    <span class="text-xs uppercase tracking-widest text-blue-300">EXISTING CMs</span>
+                </div>
+                <p class="text-blue-100 mb-6 leading-relaxed">
+                    Log in to manage your application, view interview schedules, upload required documents, and monitor approval progress. Bond-backed accountability ensures protection for all participants.
+                </p>
+                <div class="flex flex-col md:flex-row md:space-x-4 space-y-3 md:space-y-0">
+                    <a href="/mall/static/vendor/application" class="flex-1 text-center bg-emerald-500 hover:bg-emerald-600 transition-colors text-white py-3 rounded-xl font-medium">
+                        Submit Application
+                    </a>
+                    <a href="/mall/static/vendor/status" class="flex-1 text-center bg-white/10 hover:bg-white/20 transition-colors text-white py-3 rounded-xl font-medium border border-white/20">
+                        Check Status
+                    </a>
+                </div>
+                <div class="bg-white/5 rounded-xl p-4 mt-4 space-y-2 border border-white/10">
+                    <div class="flex gap-2 items-start text-sm font-bold text-blue-100">
+                        <span>🛡</span>
+                        <span>Bond-secured membership and enforcement</span>
+                    </div>
+                    <div class="flex gap-2 items-start text-sm font-bold text-blue-100">
+                        <span>⚖</span>
+                        <span>Dispute resolution by Co-op Admins</span>
+                    </div>
+                    <div class="flex gap-2 items-start text-sm font-bold text-blue-100">
+                        <span>🧯</span>
+                        <span>Liquidation safeguards: bond/withheld funds returned to victims</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-16 text-center text-sm text-blue-200 space-y-2">
+            <p>Questions about membership or eligibility? Contact your <b>Co-op Coordinator</b> or email membership@example.com.</p>
+            <div class="flex justify-center gap-4 mt-4">
+                <a href="#" class="text-blue-300 hover:text-blue-100 underline underline-offset-2">Member rules</a>
+                <span class="text-blue-400">·</span>
+                <a href="#" class="text-blue-300 hover:text-blue-100 underline underline-offset-2">Fees & contributions</a>
+                <span class="text-blue-400">·</span>
+                <a href="#" class="text-blue-300 hover:text-blue-100 underline underline-offset-2">Privacy</a>
+            </div>
+        </footer>
+    </div>
+    
+    <script th:src="@{/vendor/logger.js}"></script>
+    <script th:src="@{/vendor/api-config.js}"></script>
+    <script th:src="@{/vendor/vendor-auth-status.js}"></script>
+    <script>
+        // 初始化登录状态显示
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.VendorAuthStatus) {
+                VendorAuthStatus.init({
+                    showInNav: true,
+                    showFloating: false,
+                    requiredLogin: false
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+

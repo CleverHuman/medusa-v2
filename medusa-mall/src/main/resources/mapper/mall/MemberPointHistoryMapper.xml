@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.member.MemberPointHistoryMapper">
+
+    <resultMap type="com.medusa.mall.domain.member.MemberPointHistory" id="MemberPointHistoryResult">
+        <result property="historyId" column="history_id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="amount" column="amount"/>
+        <result property="points" column="points"/>
+        <result property="note" column="note"/>
+        <result property="platform" column="platform"/>
+        <result property="year" column="year"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="selectPointHistoryVo">
+        select history_id, member_id, amount, points, note, platform, year,
+               create_by, create_time, update_by, update_time, remark
+        from mall_member_point_history
+    </sql>
+
+    <select id="selectPointHistoryByMemberId" parameterType="Long" resultMap="MemberPointHistoryResult">
+        <include refid="selectPointHistoryVo"/>
+        where member_id = #{memberId}
+        order by create_time desc
+    </select>
+
+    <insert id="insertPointHistory" parameterType="com.medusa.mall.domain.member.MemberPointHistory" useGeneratedKeys="true" keyProperty="historyId">
+        insert into mall_member_point_history (
+            member_id, amount, points, note, platform, year,
+            create_by, create_time, update_by, update_time, remark
+        ) values (
+            #{memberId}, #{amount}, #{points}, #{note}, #{platform}, #{year},
+            #{createBy}, NOW(), #{updateBy}, NOW(), #{remark}
+        )
+    </insert>
+
+    <select id="countPointHistoryByMemberId" parameterType="Long" resultType="int">
+        select count(1) from mall_member_point_history
+        where member_id = #{memberId}
+    </select>
+
+    <select id="countPointHistoryByOrderSn" resultType="int">
+        select count(1) from mall_member_point_history
+        where member_id = #{memberId}
+        and note like CONCAT('%Order payment: ', #{orderSn}, '%')
+    </select>
+
+    <select id="sumPointsByMemberIdAndYear" resultType="java.math.BigDecimal">
+        select COALESCE(SUM(points), 0) from mall_member_point_history
+        where member_id = #{memberId}
+        and year = #{year}
+    </select>
+
+</mapper> 

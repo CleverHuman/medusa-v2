@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdrawal - Co-op Member Portal</title>
+    <link href="/css/noscript-vendor.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-gray-900">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md fixed w-full top-0 z-50 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-amber-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">V</span>
+                    </div>
+                    <span class="text-xl font-bold text-gray-900">Co-op Member Portal</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/mall/static/vendor/status" class="text-gray-600 hover:text-blue-600 transition-colors">Dashboard</a>
+                    <a href="/mall/static/vendor/application" class="text-gray-600 hover:text-blue-600 transition-colors">Application</a>
+                    <a href="/mall/static/vendor/products" class="text-gray-600 hover:text-blue-600 transition-colors">Products</a>
+                    <a href="/mall/static/vendor/orders" class="text-gray-600 hover:text-blue-600 transition-colors">Orders</a>
+                    <a href="/mall/static/vendor/bond-level" class="text-gray-600 hover:text-blue-600 transition-colors">Bond & Level</a>
+                    <a href="/mall/static/vendor/withdrawal" class="text-blue-600 font-semibold">Withdrawal</a>
+                    <div th:if="${isLoggedIn}" class="flex items-center space-x-3 border-l border-gray-300 pl-4 ml-4">
+                        <span class="text-sm text-gray-600">Logged in as:</span>
+                        <span class="text-sm font-semibold text-gray-900" th:text="${currentUsername}">username</span>
+                        <form method="post" th:action="@{/mall/static/vendor/logout}" class="inline">
+                            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-semibold text-sm">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-20 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">Withdrawal Management</h1>
+                <p class="text-gray-600 mt-2">Manage your withdrawal requests</p>
+            </div>
+
+            <!-- Error Message -->
+            <div th:if="${error}" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded">
+                <p class="text-sm text-red-700" th:text="${error}">Error message</p>
+            </div>
+
+            <!-- Success Message -->
+            <div th:if="${success}" class="bg-green-50 border-l-4 border-green-400 p-4 mb-6 rounded">
+                <p class="text-sm text-green-700" th:text="${success}">Success message</p>
+            </div>
+
+            <!-- Balance Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" th:if="${balance != null}">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Withdrawable Balance</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-2">
+                                $<span th:text="${balance.withdrawable != null ? #numbers.formatDecimal(balance.withdrawable, 0, 'COMMA', 2, 'POINT') : '0.00'}"></span> AUD
+                            </p>
+                            <p class="text-emerald-600 text-xs mt-2">Available for withdrawal</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Pending Balance</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-2">
+                                $<span th:text="${balance.pending != null ? #numbers.formatDecimal(balance.pending, 0, 'COMMA', 2, 'POINT') : '0.00'}"></span> AUD
+                            </p>
+                            <p class="text-amber-600 text-xs mt-2">Awaiting release</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Withheld Balance</p>
+                            <p class="text-3xl font-bold text-gray-900 mt-2">
+                                $<span th:text="${balance.withheld != null ? #numbers.formatDecimal(balance.withheld, 0, 'COMMA', 2, 'POINT') : '0.00'}"></span> AUD
+                            </p>
+                            <p class="text-gray-600 text-xs mt-2">Held for protection</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Withdrawal Addresses -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Withdrawal Addresses</h2>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div th:each="address : ${withdrawalAddresses}" class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-gray-900" th:text="${address.currency}">Currency</h3>
+                            <span class="px-2 py-1 text-xs rounded-full"
+                                  th:classappend="${address.isActive == 1} ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'"
+                                  th:text="${address.isActive == 1} ? 'Active' : 'Inactive'">Status</span>
+                        </div>
+                        <p class="text-sm text-gray-600 font-mono break-all" th:text="${address.address}">Address</p>
+                        <p class="text-xs text-gray-500 mt-2" th:if="${address.verifiedTime != null}">
+                            Verified: <span th:text="${#temporals.format(address.verifiedTime, 'yyyy-MM-dd')}"></span>
+                        </p>
+                    </div>
+                    <div th:if="${withdrawalAddresses == null or withdrawalAddresses.isEmpty()}" class="col-span-2 text-center text-gray-500 py-8">
+                        No withdrawal addresses configured. Please configure addresses first.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create Withdrawal Form -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Create Withdrawal Request</h2>
+                <form method="post" action="/mall/static/vendor/withdrawal/submit" class="max-w-md">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Currency *</label>
+                        <select name="currency" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                            <option value="">Select currency</option>
+                            <option value="BTC">BTC (Bitcoin)</option>
+                            <option value="XMR">XMR (Monero)</option>
+                            <option value="USDT_TRX">USDT (TRON)</option>
+                            <option value="USDT_ERC">USDT (ERC20)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Amount (AUD) *</label>
+                        <input type="number" name="amount" step="0.01" min="0.01" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                               placeholder="0.00">
+                        <p class="text-sm text-gray-500 mt-1">
+                            Available: $<span th:text="${balance != null and balance.withdrawable != null ? #numbers.formatDecimal(balance.withdrawable, 0, 'COMMA', 2, 'POINT') : '0.00'}"></span> AUD
+                        </p>
+                    </div>
+
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                        Submit Withdrawal Request
+                    </button>
+                </form>
+            </div>
+
+            <!-- Withdrawal History -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Withdrawal History</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request Code</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Currency</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request Date</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr th:each="request : ${withdrawalRequests}">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${request.requestCode}">Code</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${request.currency}">Currency</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    $<span th:text="${#numbers.formatDecimal(request.amount, 0, 'COMMA', 2, 'POINT')}"></span> AUD
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                                          th:classappend="${request.requestStatus == 'PENDING'} ? 'bg-yellow-100 text-yellow-800' : 
+                                                          (${request.requestStatus == 'APPROVED'} ? 'bg-blue-100 text-blue-800' :
+                                                          (${request.requestStatus == 'PROCESSING'} ? 'bg-purple-100 text-purple-800' :
+                                                          (${request.requestStatus == 'COMPLETED'} ? 'bg-green-100 text-green-800' :
+                                                          'bg-red-100 text-red-800')))"
+                                          th:text="${request.requestStatus}">Status</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                    th:if="${request.requestTime != null}"
+                                    th:text="${#temporals.format(request.requestTime, 'yyyy-MM-dd HH:mm:ss')}">Date</td>
+                            </tr>
+                            <tr th:if="${withdrawalRequests == null or withdrawalRequests.isEmpty()}">
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No withdrawal requests found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

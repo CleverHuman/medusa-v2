@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.medusa.mall.mapper.ShippingMethodMapper">
+
+    <resultMap type="com.medusa.mall.domain.order.ShippingMethod" id="ShippingMethodResult">
+        <id     property="id"        column="id"        />
+        <result property="code"      column="code"      />
+        <result property="name"      column="name"      />
+        <result property="fee"       column="fee"       />
+        <result property="status"    column="status"    />
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectShippingMethodVo">
+        select id, code, name, fee, status, create_time, update_time
+        from mall_shipping_method
+    </sql>
+
+    <select id="selectShippingMethodList" parameterType="ShippingMethod" resultMap="ShippingMethodResult">
+        <include refid="selectShippingMethodVo"/>
+        <where>
+            <if test="code != null and code != ''">
+                AND code = #{code}
+            </if>
+            <if test="name != null and name != ''">
+                AND name like concat('%', #{name}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectShippingMethodByCode" parameterType="String" resultMap="ShippingMethodResult">
+        <include refid="selectShippingMethodVo"/>
+        where code = #{code}
+    </select>
+
+    <insert id="insertShippingMethod" parameterType="ShippingMethod">
+        insert into mall_shipping_method (
+            id,
+            code,
+            name,
+            fee,
+            status,
+            create_time,
+            update_time
+        ) values (
+            #{id},
+            #{code},
+            #{name},
+            #{fee},
+            #{status},
+            sysdate(),
+            sysdate()
+        )
+    </insert>
+
+    <update id="updateShippingMethod" parameterType="ShippingMethod">
+        update mall_shipping_method
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="fee != null">fee = #{fee},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = sysdate()
+        </set>
+        where code = #{code}
+    </update>
+
+    <delete id="deleteShippingMethodByCode" parameterType="String">
+        delete from mall_shipping_method where code = #{code}
+    </delete>
+</mapper> 

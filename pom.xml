@@ -9,7 +9,7 @@
     <version>1.0.0</version>
 
     <name>medusa</name>
-    <url></url>
+    <url/>
     <description>medusa system</description>
     
     <properties>
@@ -30,7 +30,7 @@
         <poi.version>4.1.2</poi.version>
         <velocity.version>2.3</velocity.version>
         <jwt.version>0.9.1</jwt.version>
-        <mysql.version>8.2.0</mysql.version>
+        <mysql.version>9.2.0</mysql.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jakarta.version>6.0.0</jakarta.version>
         <springdoc.version>2.6.0</springdoc.version>
